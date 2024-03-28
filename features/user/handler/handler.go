@@ -3,11 +3,15 @@ package handler
 import (
 	"Medqueue-BE/features/user"
 	"Medqueue-BE/helper"
+	"errors"
+	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type controller struct {
@@ -84,22 +88,45 @@ func (ct *controller) Login() echo.HandlerFunc {
 }
 func (ct *controller) Profile() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		userID, err := strconv.ParseUint(c.Param("user_id"), 10, 32)
+		if err != nil {
+			log.Println("error param:", err.Error())
+			return c.JSON(http.StatusBadRequest,
+				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+		}
+
 		token, ok := c.Get("user").(*jwt.Token)
 		if !ok {
 			return c.JSON(http.StatusBadRequest,
 				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
-		result, err := ct.service.Profile(token)
+
+		result, err := ct.service.Profile(token, uint(userID))
 		if err != nil {
-			var code = http.StatusInternalServerError
-			if strings.Contains(err.Error(), "validation") || strings.Contains(err.Error(), "cek kembali") {
-				code = http.StatusBadRequest
+			// Jika tidak ada data profil yang ditemukan, kembalikan respons "not found"
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return c.JSON(http.StatusNotFound,
+					helper.ResponseFormat(http.StatusNotFound, "data tidak ditemukan", nil))
 			}
-			return c.JSON(code,
-				helper.ResponseFormat(code, err.Error(), nil))
+			// Jika terjadi kesalahan lain selain "record not found",
+			// kembalikan respons forbidden
+			log.Println("error getting profile:", err.Error())
+			return c.JSON(http.StatusForbidden,
+				helper.ResponseFormat(http.StatusForbidden, "Anda tidak diizinkan mengakses profil pengguna lain", nil))
 		}
 
+		var response ProfileResponse
+		response.UserID = result.UserID
+		response.Nama = result.Nama
+		response.Email = result.Email
+		response.Gender = result.Gender
+		response.Tgl_Lahir = result.Tgl_Lahir
+		response.Bpjs = result.Bpjs
+		response.Darah = result.Darah
+		response.Nik = result.Nik
+		response.Telp = result.Telp
+
 		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "berhasil mendapatkan data", result))
+			helper.ResponseFormat(http.StatusOK, "berhasil mendapatkan data", response))
 	}
 }

@@ -3,6 +3,7 @@ package data
 import "Medqueue-BE/features/todo/data"
 
 type User struct {
+	userID    uint
 	Nama      string
 	Email     string `gorm:"type:varchar(13);primaryKey"`
 	Password  string

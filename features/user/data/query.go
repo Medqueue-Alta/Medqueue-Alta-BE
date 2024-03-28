@@ -79,3 +79,18 @@ func (m *model) Login(email string) (user.User, error) {
 	}
 	return result, nil
 }
+
+func (m *model) GetLastUserID() (uint, error) {
+	var lastUser User
+
+	// query untuk mendapatkan userID terakhir berdasarkan id terbesar
+	if err := m.connection.Order("user_id desc").First(&lastUser).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// tabel kosong, return 0 sebagai userID pertama
+			return 0, nil
+		}
+		return 0, err
+	}
+
+	return lastUser.userID, nil
+}

@@ -16,7 +16,7 @@ type UserController interface {
 type UserService interface {
 	Register(newData User) error
 	Login(loginData User) (User, string, error)
-	Profile(token *jwt.Token) (User, error)
+	Profile(token *jwt.Token, userID uint) (User, error)
 }
 
 type UserModel interface {
@@ -24,12 +24,20 @@ type UserModel interface {
 	UpdateUser(email string, data User) error
 	Login(email string) (User, error)
 	GetUserByEmail(email string) (User, error)
+	GetLastUserID() (uint, error)
 }
 
 type User struct {
-	Nama     string
-	Email    string
-	Password string
+	UserID    uint
+	Nama      string
+	Email     string
+	Password  string
+	Tgl_Lahir string
+	Bpjs      string
+	Nik       string
+	Darah     string
+	Telp      int
+	Gender    bool
 }
 
 type Login struct {
@@ -38,7 +46,14 @@ type Login struct {
 }
 
 type Register struct {
-	Nama     string `validate:"required,alpha"`
-	Email    string `validate:"required,min=10,max=13,numeric"`
-	Password string `validate:"required,alphanum,min=8"`
+	UserID    uint
+	Nama      string `validate:"required,alpha"`
+	Email     string `validate:"required,min=10,max=13"`
+	Password  string `validate:"required,alphanum,min=8"`
+	Tgl_Lahir string `validate:"required,date'"`
+	Bpjs      string
+	Nik       string `validate:"required"`
+	Darah     string
+	Telp      int `validate:"required,min=5,max=12,numeric"`
+	Gender    bool
 }

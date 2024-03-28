@@ -27,9 +27,23 @@ func NewService(m user.UserModel) user.UserService {
 
 func (s *service) Register(newData user.User) error {
 	var registerValidate user.Register
+
+	lastUserID, error := s.model.GetLastUserID()
+	if error != nil {
+		return errors.New(helper.ServiceGeneralError)
+	}
+	newUserID := lastUserID + 1
+	newData.UserID = uint(newUserID)
+
+	registerValidate.UserID = newData.UserID
 	registerValidate.Email = newData.Email
 	registerValidate.Nama = newData.Nama
 	registerValidate.Password = newData.Password
+	registerValidate.Tgl_Lahir = newData.Tgl_Lahir
+	registerValidate.Bpjs = newData.Bpjs
+	registerValidate.Darah = newData.Darah
+	registerValidate.Nik = newData.Nik
+	registerValidate.Telp = newData.Telp
 	err := s.v.Struct(&registerValidate)
 	if err != nil {
 		log.Println("error validasi", err.Error())
@@ -76,7 +90,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 	return dbData, token, nil
 }
 
-func (s *service) Profile(token *jwt.Token) (user.User, error) {
+func (s *service) Profile(token *jwt.Token, userID uint) (user.User, error) {
 	decodeHp := middlewares.DecodeToken(token)
 	result, err := s.model.GetUserByEmail(decodeHp)
 	if err != nil {
