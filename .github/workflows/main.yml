@@ -40,4 +40,4 @@ jobs:
             docker stop ${{ secrets.CNAME }}
             docker rm ${{ secrets.CNAME }}
             docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/instalerku
-            docker run --name ${{ secrets.CNAME }} -p 8000:1323 -d -e DBHost=${{secrets.DBHOST}} -e DBPort=3306 -e DBUsername=${{secrets.DBUSERNAME}} -e DBName=${{secrets.DBNAME}} -e DBPassword=${{secrets.DBPASSWORD}} -e JWT_SECRET=${{secrets.JWT_SECRET}} ${{ secrets.DOCKERHUB_USERNAME }}/instalerku
+            docker run --name ${{ secrets.CNAME }} -p 80:1323 -d -e DBHost=${{secrets.DBHOST}} -e DBPort=3306 -e DBUsername=${{secrets.DBUSERNAME}} -e DBName=${{secrets.DBNAME}} -e DBPassword=${{secrets.DBPASSWORD}} -e JWT_SECRET=${{secrets.JWT_SECRET}} ${{ secrets.DOCKERHUB_USERNAME }}/instalerku
