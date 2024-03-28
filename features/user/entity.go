@@ -21,24 +21,24 @@ type UserService interface {
 
 type UserModel interface {
 	InsertUser(newData User) error
-	UpdateUser(hp string, data User) error
-	Login(hp string) (User, error)
-	GetUserByHP(hp string) (User, error)
+	UpdateUser(email string, data User) error
+	Login(email string) (User, error)
+	GetUserByEmail(email string) (User, error)
 }
 
 type User struct {
 	Nama     string
-	Hp       string
+	Email    string
 	Password string
 }
 
 type Login struct {
-	Hp       string `validate:"required,min=10,max=13,numeric"`
+	Email    string `validate:"required,min=10,max=13,numeric"`
 	Password string `validate:"required,alphanum,min=8"`
 }
 
 type Register struct {
 	Nama     string `validate:"required,alpha"`
-	Hp       string `validate:"required,min=10,max=13,numeric"`
+	Email    string `validate:"required,min=10,max=13,numeric"`
 	Password string `validate:"required,alphanum,min=8"`
 }

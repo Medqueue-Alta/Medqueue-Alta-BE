@@ -1,6 +1,6 @@
 package handler
 
 type LoginRequest struct {
-	Hp       string `json:"hp" form:"hp"`
+	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password" `
 }

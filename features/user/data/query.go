@@ -39,16 +39,16 @@ func (m *model) InsertUser(newData user.User) error {
 	return nil
 }
 
-func (m *model) cekUser(hp string) bool {
+func (m *model) cekUser(email string) bool {
 	var data User
-	if err := m.connection.Where("hp = ?", hp).First(&data).Error; err != nil {
+	if err := m.connection.Where("email = ?", email).First(&data).Error; err != nil {
 		return false
 	}
 	return true
 }
 
-func (m *model) UpdateUser(hp string, data user.User) error {
-	if err := m.connection.Model(&data).Where("hp = ?", hp).Update("nama", data.Nama).Update("password", data.Password).Error; err != nil {
+func (m *model) UpdateUser(email string, data user.User) error {
+	if err := m.connection.Model(&data).Where("email = ?", email).Update("nama", data.Nama).Update("password", data.Password).Error; err != nil {
 		return err
 	}
 	return nil
@@ -64,17 +64,17 @@ func (m *model) GetAllUser() ([]user.User, error) {
 	return result, nil
 }
 
-func (m *model) GetUserByHP(hp string) (user.User, error) {
+func (m *model) GetUserByEmail(email string) (user.User, error) {
 	var result user.User
-	if err := m.connection.Model(&User{}).Where("hp = ?", hp).First(&result).Error; err != nil {
+	if err := m.connection.Model(&User{}).Where("email = ?", email).First(&result).Error; err != nil {
 		return user.User{}, err
 	}
 	return result, nil
 }
 
-func (m *model) Login(hp string) (user.User, error) {
+func (m *model) Login(email string) (user.User, error) {
 	var result user.User
-	if err := m.connection.Model(&User{}).Where("hp = ? ", hp).First(&result).Error; err != nil {
+	if err := m.connection.Model(&User{}).Where("email = ? ", email).First(&result).Error; err != nil {
 		return user.User{}, err
 	}
 	return result, nil

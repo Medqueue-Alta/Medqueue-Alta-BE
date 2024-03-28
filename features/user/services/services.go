@@ -27,7 +27,7 @@ func NewService(m user.UserModel) user.UserService {
 
 func (s *service) Register(newData user.User) error {
 	var registerValidate user.Register
-	registerValidate.Hp = newData.Hp
+	registerValidate.Email = newData.Email
 	registerValidate.Nama = newData.Nama
 	registerValidate.Password = newData.Password
 	err := s.v.Struct(&registerValidate)
@@ -50,7 +50,7 @@ func (s *service) Register(newData user.User) error {
 }
 func (s *service) Login(loginData user.User) (user.User, string, error) {
 	var loginValidate user.Login
-	loginValidate.Hp = loginData.Hp
+	loginValidate.Email = loginData.Email
 	loginValidate.Password = loginData.Password
 	err := s.v.Struct(&loginValidate)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 		return user.User{}, "", err
 	}
 
-	dbData, err := s.model.Login(loginValidate.Hp)
+	dbData, err := s.model.Login(loginValidate.Email)
 	if err != nil {
 		return user.User{}, "", err
 	}
@@ -68,7 +68,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 		return user.User{}, "", errors.New(helper.UserCredentialError)
 	}
 
-	token, err := middlewares.GenerateJWT(dbData.Hp)
+	token, err := middlewares.GenerateJWT(dbData.Email)
 	if err != nil {
 		return user.User{}, "", errors.New(helper.ServiceGeneralError)
 	}
@@ -78,7 +78,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 
 func (s *service) Profile(token *jwt.Token) (user.User, error) {
 	decodeHp := middlewares.DecodeToken(token)
-	result, err := s.model.GetUserByHP(decodeHp)
+	result, err := s.model.GetUserByEmail(decodeHp)
 	if err != nil {
 		return user.User{}, err
 	}

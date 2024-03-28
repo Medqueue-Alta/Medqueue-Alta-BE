@@ -59,7 +59,7 @@ func (ct *controller) Login() echo.HandlerFunc {
 		}
 
 		var processData user.User
-		processData.Hp = input.Hp
+		processData.Email = input.Email
 		processData.Password = input.Password
 
 		result, token, err := ct.service.Login(processData)
@@ -73,7 +73,7 @@ func (ct *controller) Login() echo.HandlerFunc {
 		}
 
 		var responseData LoginResponse
-		responseData.Hp = result.Hp
+		responseData.Email = result.Email
 		responseData.Nama = result.Nama
 		responseData.Token = token
 
