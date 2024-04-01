@@ -1,14 +1,14 @@
 package main
 
 import (
-	"Medqueue-BE/config"
-	td "Medqueue-BE/features/todo/data"
-	th "Medqueue-BE/features/todo/handler"
-	ts "Medqueue-BE/features/todo/services"
-	"Medqueue-BE/features/user/data"
-	"Medqueue-BE/features/user/handler"
-	"Medqueue-BE/features/user/services"
-	"Medqueue-BE/routes"
+	"Medqueue-Alta-BE/config"
+	rd "Medqueue-Alta-BE/features/reservation/data"
+	rh "Medqueue-Alta-BE/features/reservation/handler"
+	rs "Medqueue-Alta-BE/features/reservation/services"
+	"Medqueue-Alta-BE/features/user/data"
+	"Medqueue-Alta-BE/features/user/handler"
+	"Medqueue-Alta-BE/features/user/services"
+	"Medqueue-Alta-BE/routes"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,13 +23,13 @@ func main() {
 	userService := services.NewService(userData)
 	userHandler := handler.NewUserHandler(userService)
 
-	todoData := td.New(db)
-	todoService := ts.NewTodoService(todoData)
-	todoHandler := th.NewHandler(todoService)
+	reservationData := rd.New(db)
+	reservationService := rs.NewTodoService(reservationData)
+	reservationHandler := rh.NewHandler(reservationService)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORS()) // ini aja cukup
-	routes.InitRoute(e, userHandler, todoHandler)
+	e.Use(middleware.CORS()) 
+	routes.InitRoute(e, userHandler, reservationHandler)
 	e.Logger.Fatal(e.Start(":1323"))
 }

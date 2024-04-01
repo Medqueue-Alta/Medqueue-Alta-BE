@@ -1,29 +1,44 @@
 package routes
 
 import (
-	"Medqueue-BE/config"
-	todo "Medqueue-BE/features/todo"
-	user "Medqueue-BE/features/user"
+	"Medqueue-Alta-BE/config"
+	reservation "Medqueue-Alta-BE/features/reservation"
+	user "Medqueue-Alta-BE/features/user"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
 
-func InitRoute(c *echo.Echo, ctl user.UserController, tc todo.TodoController) {
+func InitRoute(c *echo.Echo, ctl user.UserController, rc reservation.ReservationController) {
 	userRoute(c, ctl)
-	todoRoute(c, tc)
+	reservationRoute(c, rc)
 }
 
 func userRoute(c *echo.Echo, ctl user.UserController) {
-	c.POST("/users", ctl.Add())
+	c.POST("/register", ctl.Add())
 	c.POST("/login", ctl.Login())
-	c.GET("/profile", ctl.Profile(), echojwt.WithConfig(echojwt.Config{
+	c.GET("/users", ctl.Profile(), echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(config.JWTSECRET),
+	}))
+	c.PUT("/users", ctl.Update(), echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(config.JWTSECRET),
+	}))
+	c.DELETE("/users", ctl.Delete(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
 }
 
-func todoRoute(c *echo.Echo, tc todo.TodoController) {
-	c.POST("/todos", tc.Add(), echojwt.WithConfig(echojwt.Config{
+func reservationRoute(c *echo.Echo, rc reservation.ReservationController) {
+	c.POST("/reservations", rc.Add(), echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(config.JWTSECRET),
+	}))
+	c.GET("/reservations", rc.ShowMyReservation(), echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(config.JWTSECRET),
+	}))
+	c.PUT("/reservations/:id", rc.Update(), echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(config.JWTSECRET),
+	}))
+	c.DELETE("/reservations/:id", rc.Delete(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
 }

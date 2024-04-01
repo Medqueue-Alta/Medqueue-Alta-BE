@@ -1,10 +1,20 @@
 package data
 
-import "Medqueue-BE/features/todo/data"
+import (
+	"Medqueue-Alta-BE/features/reservation/data"
+)
 
 type User struct {
-	Nama     string
-	Hp       string `gorm:"type:varchar(13);primaryKey"`
-	Password string
-	Todos    []data.Todo `gorm:"foreignKey:Pemilik;references:Hp"`
+	ID            uint `gorm:"primary_key;auto_increment"`
+	Nama          string
+	Email         string
+	Password      string
+	TempatLahir   string
+	TanggalLahir  string
+	JenisKelamin  string
+	GolonganDarah string
+	NIK           string
+	NoBPJS        string
+	NoTelepon     string
+	Reservations  []data.Reservation  `gorm:"foreign_key:UserID"`
 }

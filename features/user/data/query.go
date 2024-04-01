@@ -1,7 +1,8 @@
 package data
 
 import (
-	"Medqueue-BE/features/user"
+	"Medqueue-Alta-BE/features/reservation"
+	"Medqueue-Alta-BE/features/user"
 	"errors"
 
 	"gorm.io/gorm"
@@ -11,71 +12,138 @@ type model struct {
 	connection *gorm.DB
 }
 
-// yang kita butuhkan adalah sebuah model
-// tapi kenapa return function kok bukan obyek model?
-
 func New(db *gorm.DB) user.UserModel {
 	return &model{
 		connection: db,
 	}
 }
 
-func (m *model) InsertUser(newData user.User) error {
+func (m *model) AddUser(newData user.User) error {
 	err := m.connection.Create(&newData).Error
-	// if err != nil {
-	// 	return err
-	// }
-
 	if err != nil {
-		// defer func() {
-		// 	if err := recover(); err != nil {
-		// 		log.Println("error database process:", err)
-
-		// 	}
-		// }()
 		return errors.New("terjadi masalah pada database")
 	}
-
 	return nil
 }
 
-func (m *model) cekUser(hp string) bool {
-	var data User
-	if err := m.connection.Where("hp = ?", hp).First(&data).Error; err != nil {
-		return false
-	}
-	return true
-}
-
-func (m *model) UpdateUser(hp string, data user.User) error {
-	if err := m.connection.Model(&data).Where("hp = ?", hp).Update("nama", data.Nama).Update("password", data.Password).Error; err != nil {
-		return err
-	}
-	return nil
-}
-
-func (m *model) GetAllUser() ([]user.User, error) {
-	var result []user.User
-
-	if err := m.connection.Find(&result).Error; err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
-func (m *model) GetUserByHP(hp string) (user.User, error) {
+func (m *model) Login(email string) (user.User, error) {
 	var result user.User
-	if err := m.connection.Model(&User{}).Where("hp = ?", hp).First(&result).Error; err != nil {
+	if err := m.connection.Where("email = ? ", email).First(&result).Error; err != nil {
 		return user.User{}, err
 	}
 	return result, nil
 }
 
-func (m *model) Login(hp string) (user.User, error) {
+func (m *model) GetUserByID(id uint) (user.User, error) {
 	var result user.User
-	if err := m.connection.Model(&User{}).Where("hp = ? ", hp).First(&result).Error; err != nil {
+	if err := m.connection.Model(&User{}).Where("id = ?", id).First(&result).Error; err != nil {
 		return user.User{}, err
 	}
 	return result, nil
+}
+
+func (m *model) Delete(id uint) error {
+    result := m.connection.Where("user_id = ?", id).Delete(&reservation.Reservation{})
+    if result.Error != nil {
+        return result.Error
+    }
+
+    result = m.connection.Delete(&User{}, id)
+    if result.Error != nil {
+        return result.Error
+    }
+
+    if result.RowsAffected == 0 {
+        return errors.New("no data affected")
+    }
+
+    return nil
+}
+
+
+func (m *model) Update(id uint, newData user.User) (user.User, error) {
+    var updatedUser user.User
+
+    tx := m.connection.Begin()
+
+    if newData.Nama != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("nama", newData.Nama).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.Email != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("email", newData.Email).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+    
+    if newData.Password != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("password", newData.Password).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.TempatLahir != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("tempat_lahir", newData.TempatLahir).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.TanggalLahir != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("tanggal_lahir", newData.TanggalLahir).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.JenisKelamin != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("jenis_kelamin", newData.JenisKelamin).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.GolonganDarah != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("golongan_darah", newData.GolonganDarah).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.NIK != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("nik", newData.NIK).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.NoBPJS != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("no_bpjs", newData.NoBPJS).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+
+    if newData.NoTelepon != "" {
+        if err := tx.Model(&user.User{}).Where("id = ?", id).Update("no_telepon", newData.NoTelepon).Error; err != nil {
+            tx.Rollback()
+            return user.User{}, err
+        }
+    }
+    // Commit transaction
+    if err := tx.Commit().Error; err != nil {
+        return user.User{}, err
+    }
+
+    // Ambil data user yang telah diperbarui
+    if err := m.connection.First(&updatedUser, id).Error; err != nil {
+        return user.User{}, err
+    }
+
+    return updatedUser, nil
 }

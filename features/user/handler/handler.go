@@ -1,8 +1,9 @@
 package handler
 
 import (
-	"Medqueue-BE/features/user"
-	"Medqueue-BE/helper"
+	"Medqueue-Alta-BE/features/user"
+	"Medqueue-Alta-BE/helper"
+	"log"
 	"net/http"
 	"strings"
 
@@ -30,7 +31,7 @@ func (ct *controller) Add() echo.HandlerFunc {
 					helper.ResponseFormat(http.StatusUnsupportedMediaType, "format data tidak didukung", nil))
 			}
 			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, "data yang dikirmkan tidak sesuai", nil))
+				helper.ResponseFormat(http.StatusBadRequest, "data yang dikirimkan tidak sesuai", nil))
 		}
 		err = ct.service.Register(input)
 		if err != nil {
@@ -55,11 +56,11 @@ func (ct *controller) Login() echo.HandlerFunc {
 					helper.ResponseFormat(http.StatusUnsupportedMediaType, "format data tidak didukung", nil))
 			}
 			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, "data yang dikirmkan tidak sesuai", nil))
+				helper.ResponseFormat(http.StatusBadRequest, "data yang dikirimkan tidak sesuai", nil))
 		}
 
 		var processData user.User
-		processData.Hp = input.Hp
+		processData.Email = input.Email
 		processData.Password = input.Password
 
 		result, token, err := ct.service.Login(processData)
@@ -73,13 +74,11 @@ func (ct *controller) Login() echo.HandlerFunc {
 		}
 
 		var responseData LoginResponse
-		responseData.Hp = result.Hp
-		responseData.Nama = result.Nama
+		responseData.Email = result.Email
 		responseData.Token = token
 
 		return c.JSON(http.StatusOK,
 			helper.ResponseFormat(http.StatusOK, "berhasil login", responseData))
-
 	}
 }
 func (ct *controller) Profile() echo.HandlerFunc {
@@ -103,3 +102,60 @@ func (ct *controller) Profile() echo.HandlerFunc {
 			helper.ResponseFormat(http.StatusOK, "berhasil mendapatkan data", result))
 	}
 }
+
+func (ct *controller) Update() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Get("user").(*jwt.Token)
+
+		var inputData user.User
+		if err := c.Bind(&inputData); err != nil {
+			log.Println("error binding data:", err.Error())
+			if strings.Contains(err.Error(), "unsupported") {
+				return c.JSON(http.StatusUnauthorized,
+					helper.ResponseFormat(http.StatusUnauthorized, "anda tidak bisa mengakses perintah ini", nil))
+			}
+			return c.JSON(http.StatusBadRequest,
+				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))
+		}
+
+		if inputData.Nama == "" && inputData.Email == "" && inputData.Password == "" && inputData.TempatLahir == "" &&
+			inputData.TanggalLahir == "" && inputData.JenisKelamin == "" && inputData.GolonganDarah == "" && inputData.NIK == "" && 
+			inputData.NoBPJS == "" && inputData.NoTelepon == "" {
+			return c.JSON(http.StatusBadRequest,
+				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))
+		}
+
+		updatedUser, err := ct.service.Update(token, inputData)
+		if err != nil {
+			log.Println("failed to update user:", err.Error())
+			return c.JSON(http.StatusInternalServerError,
+				helper.ResponseFormat(http.StatusInternalServerError, helper.UserInputError, nil))
+		}
+
+		return c.JSON(http.StatusOK,
+			helper.ResponseFormat(http.StatusOK, "berhasil mengubah data", updatedUser))
+	}
+}
+
+func (ct *controller) Delete() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token, ok := c.Get("user").(*jwt.Token)
+		if !ok {
+			return c.JSON(http.StatusBadRequest,
+				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))
+		}
+
+		err := ct.service.Delete(token)
+		if err != nil {
+			log.Println("gagal menghapus user:", err.Error())
+			return c.JSON(http.StatusUnauthorized,
+				helper.ResponseFormat(http.StatusUnauthorized, "anda tidak bisa mengakses perintah ini", nil))
+		}
+
+		return c.JSON(http.StatusOK,
+			helper.ResponseFormat(http.StatusOK, "berhasil menghapus data", nil))
+	}
+}
+
+
+

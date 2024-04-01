@@ -1,4 +1,4 @@
-module Medqueue-BE
+module Medqueue-Alta-BE
 
 go 1.20
 

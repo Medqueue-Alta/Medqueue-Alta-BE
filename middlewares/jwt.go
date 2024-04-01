@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"Medqueue-BE/config"
+	"Medqueue-Alta-BE/config"
 	"errors"
 	"log"
 	"time"
@@ -9,38 +9,37 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(hp string) (string, error) {
-	var data = jwt.MapClaims{}
-	// custom data
-	data["hp"] = hp
-	// mandatory data
-	data["iat"] = time.Now().Unix()
-	data["exp"] = time.Now().Add(time.Hour * 3).Unix()
+// GenerateJWT digunakan untuk membuat token JWT dengan ID.
+func GenerateJWT(id uint) (string, error) {
+    var data = jwt.MapClaims{}
+    data["id"] = id
+    data["iat"] = time.Now().Unix()
+    data["exp"] = time.Now().Add(time.Hour * 3).Unix()
 
-	var proccessToken = jwt.NewWithClaims(jwt.SigningMethodHS256, data)
+    var processToken = jwt.NewWithClaims(jwt.SigningMethodHS256, data)
 
-	result, err := proccessToken.SignedString([]byte(config.JWTSECRET))
+    result, err := processToken.SignedString([]byte(config.JWTSECRET))
 
-	if err != nil {
-		defer func() {
-			if err := recover(); err != nil {
-				log.Println("error jwt creation:", err)
+    if err != nil {
+        defer func() {
+            if err := recover(); err != nil {
+                log.Println("error jwt creation:", err)
+            }
+        }()
+        return "", errors.New("terjadi masalah pembuatan")
+    }
 
-			}
-		}()
-		return "", errors.New("terjadi masalah pembuatan te")
-	}
-
-	return result, nil
+    return result, nil
 }
 
-func DecodeToken(token *jwt.Token) string {
-	var result string
-	var claim = token.Claims.(jwt.MapClaims)
 
-	if val, found := claim["hp"]; found {
-		result = val.(string)
-	}
+func DecodeToken(token *jwt.Token) uint {
+    var result uint
+    var claim = token.Claims.(jwt.MapClaims)
 
-	return result
+    if val, found := claim["id"]; found {
+        result = uint(val.(float64)) 
+    }
+
+    return result
 }
