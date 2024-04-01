@@ -31,16 +31,16 @@ type UserModel interface {
 
 type User struct {
 	ID 				uint		`json:"id"`
-	Nama 			string		`json:"nama"`
-	Email 			string		`json:"email"`
-	Password 		string		`json:"password"`
-	TempatLahir 	string		`json:"tempat_lahir"`
-	TanggalLahir 	string		`json:"tanggal_lahir"`
-	JenisKelamin 	string		`json:"jenis_kelamin"`
-	GolonganDarah 	string		`json:"golongan_darah"`
-	NIK 			string		`json:"nik"`
-	NoBPJS 			string		`json:"no_bpjs"`
-	NoTelepon 		string		`json:"no_telepon"`
+	Nama 			string		`form:"nama" json:"nama"`
+	Email 			string		`form:"email" json:"email"`
+	Password 		string		`form:"password" json:"password"`
+	TempatLahir 	string		`form:"tempat_lahir" json:"tempat_lahir"`
+	TanggalLahir 	string		`form:"tanggal_lahir" json:"tanggal_lahir"`
+	JenisKelamin 	string		`form:"jenis_kelamin" json:"jenis_kelamin"`
+	GolonganDarah 	string		`form:"golongan_darah" json:"golongan_darah"`
+	NIK 			string		`form:"nik" json:"nik"`
+	NoBPJS 			string		`form:"no_bpjs" json:"no_bpjs"`
+	NoTelepon 		string		`form:"no_telepon" json:"no_telepon"`
 }
 
 type Login struct {
