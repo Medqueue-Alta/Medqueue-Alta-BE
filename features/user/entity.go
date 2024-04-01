@@ -51,7 +51,7 @@ type Login struct {
 type Register struct {
 	Nama 			string		`form:"nama" json:"nama" validate:"required"`
 	Email 			string		`form:"email" json:"email" validate:"required"`
-	Password 		string		`form:"password" json:"password" validate:"required"`
+	Password 		string		`form:"password" json:"password" validate:"required,alphanum,min=8"`
 	TempatLahir 	string		`form:"tempat_lahir" json:"tempat_lahir" validate:"required"`
 	TanggalLahir 	string		`form:"tanggal_lahir" json:"tanggal_lahir" validate:"required"`
 	JenisKelamin 	string		`form:"jenis_kelamin" json:"jenis_kelamin" validate:"required"`
