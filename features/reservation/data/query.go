@@ -4,6 +4,7 @@ import (
 	"Medqueue-Alta-BE/features/reservation"
 	"errors"
 
+	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
 )
 
@@ -17,28 +18,53 @@ func New(db *gorm.DB) reservation.ReservationModel {
 	}
 }
 
-func (rm *model) AddReservation(userid uint, reservasiBaru reservation.Reservation) (reservation.Reservation, error) {
-	var inputProcess = Reservation{PoliKlinik: reservasiBaru.PoliKlinik, TanggalDaftar: reservasiBaru.TanggalDaftar, 
-		Jadwal: reservasiBaru.Jadwal, Keluhan: reservasiBaru.Keluhan,UserID : userid}
+// query.go
+func (rm *model) AddReservation(adminID uint, reservasiBaru reservation.Reservation) (reservation.Reservation, error) {
+	// Create Reservation object
+	var inputProcess = reservation.Reservation{
+		PoliKlinik:   reservasiBaru.PoliKlinik,
+		Hari:         reservasiBaru.Hari,
+		WaktuMulai:   reservasiBaru.WaktuMulai,
+		WaktuSelesai: reservasiBaru.WaktuSelesai,
+		Kuota:        reservasiBaru.Kuota,
+		AdminID:      adminID, // Assuming adminID is the user ID of the admin creating the reservation
+	}
+
+	// Insert into the database
 	if err := rm.connection.Create(&inputProcess).Error; err != nil {
 		return reservation.Reservation{}, err
 	}
 
-	return reservation.Reservation{PoliKlinik: inputProcess.PoliKlinik, TanggalDaftar: inputProcess.TanggalDaftar,
-		Jadwal: inputProcess.Jadwal, Keluhan: reservasiBaru.Keluhan}, nil
+	// Return the created reservation
+	return inputProcess, nil
 }
 
-func (rm *model) UpdateReservation(userid uint, reservationID uint, data reservation.Reservation) (reservation.Reservation, error) {
-	var qry = rm.connection.Where("user_id = ? AND id = ?", userid, reservationID).Updates(data)
-	if err := qry.Error; err != nil {
+func (s *services) UpdateReservation(adminID *jwt.Token, reservationID uint, data reservation.Reservation) (reservation.Reservation, error) {
+	// Get the user ID from the middleware
+	userID, err := s.md.GetUserID()
+	if err != nil {
 		return reservation.Reservation{}, err
 	}
 
-	if qry.RowsAffected < 1 {
-		return reservation.Reservation{}, errors.New("no data affected")
+	// Check if the user is an admin
+	isAdmin, err := s.isAdmin(userID)
+	if err != nil {
+		return reservation.Reservation{}, err
+	}
+	if !isAdmin {
+		return reservation.Reservation{}, errors.New("only admin can update reservation")
 	}
 
-	return data, nil
+	// Validate input (if necessary)
+	// Add your validation logic here if needed
+
+	// Update reservation
+	result, err := s.m.UpdateReservation(userID, reservationID, data)
+	if err != nil {
+		return reservation.Reservation{}, err
+	}
+
+	return result, nil
 }
 
 func (rm *model) GetReservationByOwner(userid uint) ([]reservation.Reservation, error) {
@@ -51,14 +77,14 @@ func (rm *model) GetReservationByOwner(userid uint) ([]reservation.Reservation, 
 }
 
 func (rm *model) DeleteReservation(userid uint, reservationID uint) error {
-    result := rm.connection.Unscoped().Where("user_id = ? AND id = ?", userid, reservationID).Delete(&Reservation{})
-    if result.Error != nil {
-        return result.Error
-    }
+	result := rm.connection.Unscoped().Where("user_id = ? AND id = ?", userid, reservationID).Delete(&Reservation{})
+	if result.Error != nil {
+		return result.Error
+	}
 
-    if result.RowsAffected == 0 {
-        return errors.New("no data affected")
-    }
+	if result.RowsAffected == 0 {
+		return errors.New("no data affected")
+	}
 
-    return nil
+	return nil
 }
