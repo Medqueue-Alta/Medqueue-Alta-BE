@@ -1,7 +1,6 @@
 package data
 
 import (
-	"Medqueue-Alta-BE/features/reservation"
 	"Medqueue-Alta-BE/features/user"
 	"errors"
 
@@ -10,6 +9,11 @@ import (
 
 type model struct {
 	connection *gorm.DB
+}
+
+// Delete implements user.UserModel.
+func (m *model) Delete(id uint) error {
+	panic("unimplemented")
 }
 
 func New(db *gorm.DB) user.UserModel {
@@ -48,23 +52,6 @@ func (m *model) GetUserByEmail(email string) (user.User, error) {
 		return user.User{}, err
 	}
 	return result, nil
-}
-func (m *model) Delete(id uint) error {
-	result := m.connection.Where("user_id = ?", id).Delete(&reservation.Reservation{})
-	if result.Error != nil {
-		return result.Error
-	}
-
-	result = m.connection.Delete(&User{}, id)
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return errors.New("no data affected")
-	}
-
-	return nil
 }
 
 func (m *model) Update(id uint, newData user.User) (user.User, error) {

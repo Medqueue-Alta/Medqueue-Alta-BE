@@ -1,9 +1,5 @@
 package data
 
-import (
-	"Medqueue-Alta-BE/features/reservation/data"
-)
-
 type User struct {
 	ID            uint `gorm:"primary_key;auto_increment"`
 	Nama          string
@@ -16,5 +12,4 @@ type User struct {
 	NIK           string
 	NoBPJS        string
 	NoTelepon     string
-	Reservations  []data.Reservation  `gorm:"foreign_key:UserID"`
 }

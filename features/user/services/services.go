@@ -30,8 +30,8 @@ func NewService(m user.UserModel, pm helper.PasswordManager, md middlewares.JwtI
 
 func (s *service) SaveAdmin(adminData user.User) error {
 	// Define the admin email and password
-	adminEmail := "admin@example.com"
-	adminPassword := "passadmin"
+	adminEmail := "admin@mail.com"
+	adminPassword := "admin123"
 
 	// Check if the admin already exists
 	_, err := s.model.GetUserByEmail(adminEmail)
@@ -50,13 +50,11 @@ func (s *service) SaveAdmin(adminData user.User) error {
 	}
 
 	// Create admin user object
-	adminData := user.User{
+	adminData = user.User{
 		Email:    adminEmail,
 		Password: newPassword,
-		// Add any other admin details here
 	}
 
-	// Add admin user to the database
 	err = s.model.AddUser(adminData)
 	if err != nil {
 		return errors.New(helper.ServerGeneralError)
