@@ -4,9 +4,11 @@ import "gorm.io/gorm"
 
 type Reservation struct {
 	gorm.Model
-	UserID 				uint
-	PoliKlinik 			string
-	TanggalDaftar 		string
-	Jadwal 				string
-	Keluhan 			string
+	PoliKlinik   string
+	Hari         string
+	WaktuMulai   string
+	WaktuSelesai string
+	Kuota        int
+	UserID       uint
+	AdminID      uint
 }
