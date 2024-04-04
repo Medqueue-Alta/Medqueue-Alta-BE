@@ -4,7 +4,6 @@ import (
 	"Medqueue-Alta-BE/features/reservation"
 	"errors"
 
-	"github.com/golang-jwt/jwt"
 	"gorm.io/gorm"
 )
 
@@ -39,7 +38,7 @@ func (rm *model) AddReservation(adminID uint, reservasiBaru reservation.Reservat
 	return inputProcess, nil
 }
 
-func (s *services) UpdateReservation(adminID *jwt.Token, reservationID uint, data reservation.Reservation) (reservation.Reservation, error) {
+func (rm *model) UpdateReservation(adminID uint, reservationID uint, data reservation.Reservation) (reservation.Reservation, error) {
 	// Get the user ID from the middleware
 	userID, err := s.md.GetUserID()
 	if err != nil {

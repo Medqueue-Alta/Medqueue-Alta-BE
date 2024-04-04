@@ -4,6 +4,7 @@ import (
 	"Medqueue-Alta-BE/features/user"
 	"Medqueue-Alta-BE/helper"
 	"Medqueue-Alta-BE/middlewares"
+	"database/sql"
 	"errors"
 	"log"
 
@@ -25,6 +26,43 @@ func NewService(m user.UserModel, pm helper.PasswordManager, md middlewares.JwtI
 		md:    md,
 		v:     validator.New(),
 	}
+}
+
+func (s *service) SaveAdmin(adminData user.User) error {
+	// Define the admin email and password
+	adminEmail := "admin@example.com"
+	adminPassword := "passadmin"
+
+	// Check if the admin already exists
+	_, err := s.model.GetUserByEmail(adminEmail)
+	if err == nil {
+		// Admin already exists, no need to add again
+		return nil
+	} else if !errors.Is(err, sql.ErrNoRows) {
+		// Some other error occurred
+		return errors.New(helper.ServerGeneralError)
+	}
+
+	// Admin does not exist, proceed with adding
+	newPassword, err := s.pm.HashPassword(adminPassword)
+	if err != nil {
+		return errors.New(helper.ServiceGeneralError)
+	}
+
+	// Create admin user object
+	adminData := user.User{
+		Email:    adminEmail,
+		Password: newPassword,
+		// Add any other admin details here
+	}
+
+	// Add admin user to the database
+	err = s.model.AddUser(adminData)
+	if err != nil {
+		return errors.New(helper.ServerGeneralError)
+	}
+
+	return nil
 }
 
 func (s *service) Register(newData user.User) error {

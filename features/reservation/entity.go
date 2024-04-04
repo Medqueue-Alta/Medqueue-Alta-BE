@@ -16,8 +16,8 @@ type ReservationController interface {
 
 type ReservationModel interface {
 	AddReservation(adminid uint, reservasiBaru Reservation) (Reservation, error)
-	UpdateReservation(userid uint, reservationID uint, data Reservation) (Reservation, error)
-	DeleteReservation(userid uint, reservationID uint) error
+	UpdateReservation(adminid uint, reservationID uint, data Reservation) (Reservation, error)
+	DeleteReservation(adminid uint, reservationID uint) error
 	GetReservationByOwner(userid uint) ([]Reservation, error)
 }
 

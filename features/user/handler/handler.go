@@ -73,6 +73,24 @@ func (ct *controller) Login() echo.HandlerFunc {
 				helper.ResponseFormat(code, err.Error(), nil))
 		}
 
+		// Check if the login is for admin
+		if input.Email == "admin@mail.com" && input.Password == "admin123" {
+			// If admin login, save admin details
+			adminData := user.User{
+				ID:       1,
+				Email:    "admin@mail.com",
+				Password: "admin123",
+				// Add any other admin details here
+			}
+			// Save admin details as required
+			// For example, you can use a service method to save admin data to the database
+			err := ct.service.SaveAdmin(adminData)
+			if err != nil {
+				// Handle error saving admin details
+				// You can log the error or return an appropriate response
+			}
+		}
+
 		var responseData LoginResponse
 		responseData.Email = result.Email
 		responseData.Token = token
@@ -81,6 +99,7 @@ func (ct *controller) Login() echo.HandlerFunc {
 			helper.ResponseFormat(http.StatusOK, "berhasil login", responseData))
 	}
 }
+
 func (ct *controller) Profile() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		token, ok := c.Get("user").(*jwt.Token)
@@ -119,7 +138,7 @@ func (ct *controller) Update() echo.HandlerFunc {
 		}
 
 		if inputData.Nama == "" && inputData.Email == "" && inputData.Password == "" && inputData.TempatLahir == "" &&
-			inputData.TanggalLahir == "" && inputData.JenisKelamin == "" && inputData.GolonganDarah == "" && inputData.NIK == "" && 
+			inputData.TanggalLahir == "" && inputData.JenisKelamin == "" && inputData.GolonganDarah == "" && inputData.NIK == "" &&
 			inputData.NoBPJS == "" && inputData.NoTelepon == "" {
 			return c.JSON(http.StatusBadRequest,
 				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))
@@ -156,6 +175,3 @@ func (ct *controller) Delete() echo.HandlerFunc {
 			helper.ResponseFormat(http.StatusOK, "berhasil menghapus data", nil))
 	}
 }
-
-
-
