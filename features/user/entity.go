@@ -31,6 +31,7 @@ type UserModel interface {
 
 type User struct {
 	ID 				uint		`json:"id"`
+	Role			string		`json:"role"`
 	Nama 			string		`form:"nama" json:"nama"`
 	Email 			string		`form:"email" json:"email"`
 	Password 		string		`form:"password" json:"password"`
