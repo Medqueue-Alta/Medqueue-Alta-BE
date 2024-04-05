@@ -27,10 +27,9 @@ type ReservationService interface {
 }
 
 type Reservation struct {
-	ID 					uint
-	UserID 				uint
-	PoliKlinik 			string
-	TanggalDaftar 		string
-	Jadwal 				string
-	Keluhan 			string
+	ID 					uint   `json:"reservations_id"`
+	PoliKlinik 			string `json:"poli"`
+	TanggalDaftar 		string `json:"tanggal_kunjungan"`
+	Jadwal 				string `json:"id_jadwal"`
+	Keluhan 			string `json:"keluhan"`
 }

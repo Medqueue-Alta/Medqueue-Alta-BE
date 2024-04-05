@@ -27,11 +27,10 @@ type ScheduleService interface {
 }
 
 type Schedule struct {
-	ID 					uint
-	UserID 				uint
-	PoliKlinik 			string
-	Hari 				string
-	WaktuMulai 			string
-	WaktuSelesai		string
-	Kuota	 			string
+	ID 					uint   `json:"schedule_id"`
+	PoliKlinik 			string `json:"poli"`
+	Hari 				string `json:"hari"`
+	WaktuMulai 			string `json:"jam_mulai"`
+	WaktuSelesai		string `json:"jam_selesai"`
+	Kuota	 			string `json:"kuota"`
 }
