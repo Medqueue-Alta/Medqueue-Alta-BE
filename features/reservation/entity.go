@@ -29,7 +29,7 @@ type ReservationService interface {
 type Reservation struct {
 	ID 					uint   `json:"reservations_id"`
 	PoliKlinik 			string `json:"poli"`
-	TanggalDaftar 		string `json:"tanggal_kunjungan"`
+	TanggalDaftar 		string `form:"tanggal_kunjungan" json:"tanggal_kunjungan"`
 	Jadwal 				string `json:"id_jadwal"`
 	Keluhan 			string `json:"keluhan"`
 }
