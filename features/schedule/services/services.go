@@ -24,7 +24,7 @@ func NewScheduleService(model schedule.ScheduleModel) schedule.ScheduleService {
 }
 
 func (s *service) AddSchedule(userid *jwt.Token, scheduleBaru schedule.Schedule) (schedule.Schedule, error) {
-	id := middlewares.DecodeToken(userid)
+	id := middlewares.NewMidlewareJWT().DecodeToken(userid)
 	if id == 0 {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return schedule.Schedule{}, errors.New("data tidak valid")
@@ -45,7 +45,7 @@ func (s *service) AddSchedule(userid *jwt.Token, scheduleBaru schedule.Schedule)
 }
 
 func (s *service) UpdateSchedule(userid *jwt.Token, scheduleID uint, data schedule.Schedule) (schedule.Schedule, error) {
-	id := middlewares.DecodeToken(userid)
+	id := middlewares.NewMidlewareJWT().DecodeToken(userid)
 	if id == 0 {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return schedule.Schedule{}, errors.New("data tidak valid")
@@ -66,24 +66,22 @@ func (s *service) UpdateSchedule(userid *jwt.Token, scheduleID uint, data schedu
 }
 
 func (s *service) DeleteSchedule(userid *jwt.Token, scheduleID uint) error {
-    id := middlewares.DecodeToken(userid)
-    if id == 0 {
-        log.Println("error decode token:", "token tidak ditemukan")
-        return errors.New("data tidak valid")
-    }
+	id := middlewares.NewMidlewareJWT().DecodeToken(userid)
+	if id == 0 {
+		log.Println("error decode token:", "token tidak ditemukan")
+		return errors.New("data tidak valid")
+	}
 
-    err := s.m.DeleteSchedule(id, scheduleID) 
-    if err != nil {
-        return errors.New("gagal menghapus")
-    }
+	err := s.m.DeleteSchedule(id, scheduleID)
+	if err != nil {
+		return errors.New("gagal menghapus")
+	}
 
-    return nil
+	return nil
 }
 
-
-
 func (s *service) GetScheduleByOwner(userid *jwt.Token) ([]schedule.Schedule, error) {
-	id := middlewares.DecodeToken(userid)
+	id := middlewares.NewMidlewareJWT().DecodeToken(userid)
 	if id == 0 {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return nil, errors.New("data tidak valid")

@@ -10,9 +10,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func InitRoute(c *echo.Echo, ctl user.UserController, rc reservation.ReservationController, sc schedule.ScheduleController) {
+func InitRoute(c *echo.Echo, ctl user.UserController, sc schedule.ScheduleController) {
 	userRoute(c, ctl)
-	reservationRoute(c, rc)
 	scheduleRoute(c, sc)
 }
 

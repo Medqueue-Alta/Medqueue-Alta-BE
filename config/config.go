@@ -1,7 +1,6 @@
 package config
 
 import (
-	reservation "Medqueue-Alta-BE/features/reservation/data"
 	schedule "Medqueue-Alta-BE/features/schedule/data"
 	user "Medqueue-Alta-BE/features/user/data"
 	"fmt"
@@ -78,7 +77,7 @@ func InitSQL(c AppConfig) *gorm.DB {
 		return nil
 	}
 
-	db.AutoMigrate(&user.User{}, &reservation.Reservation{}, &schedule.Schedule{})
+	db.AutoMigrate(&user.User{}, &schedule.Schedule{})
 
 	return db
 }
