@@ -1,6 +1,8 @@
 package data
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Schedule struct {
 	gorm.Model

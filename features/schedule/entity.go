@@ -17,6 +17,7 @@ type ScheduleModel interface {
 	UpdateSchedule(userid uint, scheduleID uint, data Schedule) (Schedule, error)
 	DeleteSchedule(userid uint, scheduleID uint) error
 	GetScheduleByOwner(userid uint) ([]Schedule, error)
+	GetUserByID(userID uint) (User, error)
 }
 
 type ScheduleService interface {
@@ -33,4 +34,11 @@ type Schedule struct {
 	WaktuMulai 			string `json:"jam_mulai"`
 	WaktuSelesai		string `json:"jam_selesai"`
 	Kuota	 			string `json:"kuota"`
+}
+
+type User struct {
+	ID 				uint		`json:"id"`
+	Role			string		`json:"role"`
+	Nama 			string		`json:"nama"`
+	Email 			string		`json:"email"`
 }

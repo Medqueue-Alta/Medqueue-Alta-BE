@@ -24,25 +24,41 @@ func NewScheduleService(model schedule.ScheduleModel) schedule.ScheduleService {
 }
 
 func (s *service) AddSchedule(userid *jwt.Token, scheduleBaru schedule.Schedule) (schedule.Schedule, error) {
-	id := middlewares.DecodeToken(userid)
-	if id == 0 {
-		log.Println("error decode token:", "token tidak ditemukan")
-		return schedule.Schedule{}, errors.New("data tidak valid")
-	}
+    userInfo, err := middlewares.DecodeTokenWithClaims(userid)
+    if err != nil {
+        log.Println("error decode token", err.Error())
+        return schedule.Schedule{}, err
+    }
 
-	err := s.v.Struct(&scheduleBaru)
-	if err != nil {
-		log.Println("error validasi", err.Error())
-		return schedule.Schedule{}, err
-	}
+    // Mendapatkan informasi pengguna dari sistem penyimpanan Anda (misalnya, basis data)
+    user, err := s.m.GetUserByID(userInfo)
+    if err != nil {
+        log.Println("error mendapatkan informasi pengguna", err.Error())
+        return schedule.Schedule{}, err
+    }
 
-	result, err := s.m.AddSchedule(id, scheduleBaru)
-	if err != nil {
-		return schedule.Schedule{}, errors.New(helper.ServerGeneralError)
-	}
+    // Memeriksa peran pengguna
+    if user.Role != "admin" {
+        log.Println("error: hanya admin yang diizinkan menambah jadwal")
+        return schedule.Schedule{}, errors.New("hanya admin yang diizinkan menambah jadwal")
+    }
 
-	return result, nil
+    // Melakukan validasi struktur jadwal baru
+    err = s.v.Struct(&scheduleBaru)
+    if err != nil {
+        log.Println("error validasi", err.Error())
+        return schedule.Schedule{}, err
+    }
+
+    // Menambahkan jadwal baru
+    result, err := s.m.AddSchedule(user.ID, scheduleBaru)
+    if err != nil {
+        return schedule.Schedule{}, errors.New(helper.ServerGeneralError)
+    }
+
+    return result, nil
 }
+
 
 func (s *service) UpdateSchedule(userid *jwt.Token, scheduleID uint, data schedule.Schedule) (schedule.Schedule, error) {
 	id := middlewares.DecodeToken(userid)

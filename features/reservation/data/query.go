@@ -62,3 +62,11 @@ func (rm *model) DeleteReservation(userid uint, reservationID uint) error {
 
     return nil
 }
+
+func (rm *model) GetUserByID(userID uint) (reservation.User, error) {
+    var user reservation.User
+    if err := rm.connection.First(&user, userID).Error; err != nil {
+        return reservation.User{}, err
+    }
+    return user, nil
+}

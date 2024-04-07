@@ -24,19 +24,30 @@ func NewReservationService(model reservation.ReservationModel) reservation.Reser
 }
 
 func (s *service) AddReservation(userid *jwt.Token, reservasiBaru reservation.Reservation) (reservation.Reservation, error) {
-	id := middlewares.DecodeToken(userid)
-	if id == 0 {
-		log.Println("error decode token:", "token tidak ditemukan")
-		return reservation.Reservation{}, errors.New("data tidak valid")
+	userInfo, err := middlewares.DecodeTokenWithClaims(userid)
+    if err != nil {
+        log.Println("error decode token", err.Error())
+        return reservation.Reservation{}, err
+    }
+
+	user, err := s.m.GetUserByID(userInfo)
+    if err != nil {
+        log.Println("error mendapatkan informasi pengguna", err.Error())
+        return reservation.Reservation{}, err
 	}
 
-	err := s.v.Struct(&reservasiBaru)
+	if user.Role != "pasien" {
+        log.Println("error: hanya pasien yang diizinkan menambah reservasi")
+        return reservation.Reservation{}, errors.New("hanya admin yang diizinkan menambah reservasi")
+    }
+
+	err = s.v.Struct(&reservasiBaru)
 	if err != nil {
 		log.Println("error validasi", err.Error())
 		return reservation.Reservation{}, err
 	}
 
-	result, err := s.m.AddReservation(id, reservasiBaru)
+	result, err := s.m.AddReservation(user.ID, reservasiBaru)
 	if err != nil {
 		return reservation.Reservation{}, errors.New(helper.ServerGeneralError)
 	}

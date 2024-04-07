@@ -43,3 +43,18 @@ func DecodeToken(token *jwt.Token) uint {
 
     return result
 }
+
+func DecodeTokenWithClaims(token *jwt.Token) (uint, error) {
+    var result uint
+    var claim = token.Claims.(jwt.MapClaims)
+
+    if val, found := claim["id"]; found {
+        result = uint(val.(float64))
+    } else {
+        return 0, errors.New("ID pengguna tidak ditemukan dalam token")
+    }
+
+    return result, nil
+}
+
+
