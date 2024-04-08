@@ -168,7 +168,7 @@ func (ct *controller) ShowMySchedule() echo.HandlerFunc {
 			return c.JSON(http.StatusInternalServerError,
 				helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
-
+		fmt.Println(poliID)
 		// Return the schedules as a JSON response
 		return c.JSON(http.StatusOK,
 			helper.ResponseFormat(http.StatusOK, "user's schedules", schedules))
