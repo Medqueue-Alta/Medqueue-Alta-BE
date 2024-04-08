@@ -75,6 +75,11 @@ func (ct *controller) Login() echo.HandlerFunc {
 
 		var responseData LoginResponse
 		responseData.Email = result.Email
+<<<<<<< Updated upstream
+=======
+		responseData.Nama = result.Nama
+		responseData.Role = result.Role
+>>>>>>> Stashed changes
 		responseData.Token = token
 
 		return c.JSON(http.StatusOK,
