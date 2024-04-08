@@ -75,7 +75,7 @@ func (ct *controller) Login() echo.HandlerFunc {
 
 		var responseData LoginResponse
 		responseData.Email = result.Email
-		responseData.Nama = responseData.Nama
+		responseData.Nama = result.Nama
 		responseData.Role = "Pasien"
 		responseData.Token = token
 
