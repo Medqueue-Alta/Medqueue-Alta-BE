@@ -24,9 +24,12 @@ func (rm *model) AddSchedule(userid uint, scheduleBaru schedule.Schedule) (sched
 		return schedule.Schedule{}, err
 	}
 
-	return schedule.Schedule{PoliKlinik: inputProcess.PoliKlinik, Hari: inputProcess.Hari,
-		WaktuMulai: inputProcess.WaktuMulai, WaktuSelesai: inputProcess.WaktuSelesai,
-		Kuota: inputProcess.Kuota}, nil
+	return schedule.Schedule{
+		PoliKlinik:   inputProcess.PoliKlinik,
+		Hari:         inputProcess.Hari,
+		WaktuMulai:   inputProcess.WaktuMulai,
+		WaktuSelesai: inputProcess.WaktuSelesai,
+		Kuota:        inputProcess.Kuota}, nil
 }
 
 func (rm *model) UpdateSchedule(userid uint, scheduleID uint, data schedule.Schedule) (schedule.Schedule, error) {

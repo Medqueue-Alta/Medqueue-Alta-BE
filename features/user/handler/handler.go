@@ -76,7 +76,7 @@ func (ct *controller) Login() echo.HandlerFunc {
 		var responseData LoginResponse
 		responseData.Email = result.Email
 		responseData.Nama = result.Nama
-		responseData.Role = "Pasien"
+		responseData.Role = result.Role
 		responseData.Token = token
 
 		return c.JSON(http.StatusOK,
@@ -120,9 +120,7 @@ func (ct *controller) Update() echo.HandlerFunc {
 				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))
 		}
 
-		if inputData.Nama == "" && inputData.Email == "" && inputData.Password == "" && inputData.TempatLahir == "" &&
-			inputData.TanggalLahir == "" && inputData.JenisKelamin == "" && inputData.GolonganDarah == "" && inputData.NIK == "" &&
-			inputData.NoBPJS == "" && inputData.NoTelepon == "" {
+		if inputData.Nama == "" && inputData.Email == "" && inputData.Password == "" && inputData.TempatLahir == "" {
 			return c.JSON(http.StatusBadRequest,
 				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))
 		}

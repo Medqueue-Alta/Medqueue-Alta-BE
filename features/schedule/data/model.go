@@ -12,5 +12,5 @@ type Schedule struct {
 	Hari         string
 	WaktuMulai   string
 	WaktuSelesai string
-	Kuota        string
+	Kuota        int
 }
