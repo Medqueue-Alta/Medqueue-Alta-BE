@@ -3,6 +3,7 @@ package handler
 import (
 	"Medqueue-Alta-BE/features/schedule"
 	"Medqueue-Alta-BE/helper"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -64,6 +65,7 @@ func (ct *controller) Add() echo.HandlerFunc {
 			log.Println("error insert db:", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
+		fmt.Println(poliID)
 
 		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "berhasil menambahkan schedule", result))
 	}
