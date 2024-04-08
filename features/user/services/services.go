@@ -4,7 +4,6 @@ import (
 	"Medqueue-Alta-BE/features/user"
 	"Medqueue-Alta-BE/helper"
 	"Medqueue-Alta-BE/middlewares"
-	"database/sql"
 	"errors"
 	"log"
 
@@ -15,54 +14,15 @@ import (
 type service struct {
 	model user.UserModel
 	pm    helper.PasswordManager
-	md    middlewares.JwtInterface
 	v     *validator.Validate
 }
 
-func NewService(m user.UserModel, pm helper.PasswordManager, md middlewares.JwtInterface) user.UserService {
+func NewService(m user.UserModel) user.UserService {
 	return &service{
 		model: m,
-		pm:    pm,
-		md:    md,
+		pm:    helper.NewPasswordManager(),
 		v:     validator.New(),
 	}
-}
-
-func (s *service) SaveAdmin(adminData user.User) error {
-	// Define the admin email and password
-	adminEmail := "admin@example.com"
-	adminPassword := "passadmin"
-
-	// Check if the admin already exists
-	_, err := s.model.GetUserByEmail(adminEmail)
-	if err == nil {
-		// Admin already exists, no need to add again
-		return nil
-	} else if !errors.Is(err, sql.ErrNoRows) {
-		// Some other error occurred
-		return errors.New(helper.ServerGeneralError)
-	}
-
-	// Admin does not exist, proceed with adding
-	newPassword, err := s.pm.HashPassword(adminPassword)
-	if err != nil {
-		return errors.New(helper.ServiceGeneralError)
-	}
-
-	// Create admin user object
-	adminData = user.User{
-		Email:    adminEmail,
-		Password: newPassword,
-		// Add any other admin details here
-	}
-
-	// Add admin user to the database
-	err = s.model.AddUser(adminData)
-	if err != nil {
-		return errors.New(helper.ServerGeneralError)
-	}
-
-	return nil
 }
 
 func (s *service) Register(newData user.User) error {
@@ -115,7 +75,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 		return user.User{}, "", errors.New(helper.UserCredentialError)
 	}
 
-	token, err := s.md.GenerateJWT(dbData.ID)
+	token, err := middlewares.GenerateJWT(dbData.ID)
 	if err != nil {
 		return user.User{}, "", errors.New(helper.ServiceGeneralError)
 	}
@@ -124,7 +84,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 }
 
 func (s *service) Profile(token *jwt.Token) (user.User, error) {
-	decodeId := s.md.DecodeToken(token)
+	decodeId := middlewares.DecodeToken(token)
 	result, err := s.model.GetUserByID(decodeId)
 	if err != nil {
 		return user.User{}, err
@@ -134,7 +94,7 @@ func (s *service) Profile(token *jwt.Token) (user.User, error) {
 }
 
 func (s *service) Update(token *jwt.Token, newData user.User) (user.User, error) {
-	decodedID := s.md.DecodeToken(token)
+	decodedID := middlewares.DecodeToken(token)
 
 	existingUser, err := s.model.GetUserByID(decodedID)
 	if err != nil {
@@ -194,7 +154,7 @@ func (s *service) Update(token *jwt.Token, newData user.User) (user.User, error)
 }
 
 func (s *service) Delete(token *jwt.Token) error {
-	decodedID := s.md.DecodeToken(token)
+	decodedID := middlewares.DecodeToken(token)
 	if decodedID == 0 {
 		log.Println("error decode token:", "token tidak ditemukan")
 		return errors.New("data tidak valid")

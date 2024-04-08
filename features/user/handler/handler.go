@@ -122,6 +122,7 @@ func (ct *controller) Update() echo.HandlerFunc {
 
 		if inputData.Nama == "" && inputData.Email == "" && inputData.Password == "" && inputData.TempatLahir == "" &&
 			inputData.TanggalLahir == "" && inputData.JenisKelamin == "" && inputData.GolonganDarah == "" && inputData.NIK == "" &&
+			inputData.TanggalLahir == "" && inputData.JenisKelamin == "" && inputData.GolonganDarah == "" && inputData.NIK == "" &&
 			inputData.NoBPJS == "" && inputData.NoTelepon == "" {
 			return c.JSON(http.StatusBadRequest,
 				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))

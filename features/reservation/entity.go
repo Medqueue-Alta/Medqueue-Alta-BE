@@ -17,6 +17,7 @@ type ReservationModel interface {
 	UpdateReservation(userid uint, reservationID uint, data Reservation) (Reservation, error)
 	DeleteReservation(userid uint, reservationID uint) error
 	GetReservationByOwner(userid uint) ([]Reservation, error)
+	GetUserByID(userID uint) (User, error)
 }
 
 type ReservationService interface {
@@ -27,10 +28,16 @@ type ReservationService interface {
 }
 
 type Reservation struct {
-	ID 					uint
-	UserID 				uint
-	PoliKlinik 			string
-	TanggalDaftar 		string
-	Jadwal 				string
-	Keluhan 			string
+	ID 					uint   `json:"reservations_id"`
+	PoliKlinik 			string `json:"poli"`
+	TanggalDaftar 		string `form:"tanggal_kunjungan" json:"tanggal_kunjungan"`
+	Jadwal 				string `json:"id_jadwal"`
+	Keluhan 			string `json:"keluhan"`
+}
+
+type User struct {
+	ID 				uint		`json:"id"`
+	Role			string		`json:"role"`
+	Nama 			string		`json:"nama"`
+	Email 			string		`json:"email"`
 }

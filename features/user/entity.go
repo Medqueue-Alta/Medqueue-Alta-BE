@@ -32,15 +32,15 @@ type UserModel interface {
 
 type User struct {
 	ID            uint   `json:"id"`
-	Role          string `json:"role"`
+	Role          string `gorm:"default:pasien" json:"role"`
 	Nama          string `form:"nama" json:"nama"`
 	Email         string `form:"email" json:"email"`
 	Password      string `form:"password" json:"password"`
 	TempatLahir   string `form:"tempat_lahir" json:"tempat_lahir"`
-	TanggalLahir  string `form:"tanggal_lahir" json:"tanggal_lahir"`
-	JenisKelamin  string `form:"jenis_kelamin" json:"jenis_kelamin"`
-	GolonganDarah string `form:"golongan_darah" json:"golongan_darah"`
-	NIK           string `form:"nik" json:"nik"`
+	TanggalLahir  string `form:"tgl_lahir" json:"tgl_lahir"`
+	JenisKelamin  string `form:"gender" json:"gender"`
+	GolonganDarah string `form:"gol_darah" json:"gol_darah"`
+	NIK           string `form:"no_nik" json:"no_nik"`
 	NoBPJS        string `form:"no_bpjs" json:"no_bpjs"`
 	NoTelepon     string `form:"no_telepon" json:"no_telepon"`
 }

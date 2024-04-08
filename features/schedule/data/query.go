@@ -18,14 +18,8 @@ func New(db *gorm.DB) schedule.ScheduleModel {
 }
 
 func (rm *model) AddSchedule(userid uint, scheduleBaru schedule.Schedule) (schedule.Schedule, error) {
-	var inputProcess = Schedule{
-		PoliKlinik:   scheduleBaru.PoliKlinik,
-		Hari:         scheduleBaru.Hari,
-		WaktuMulai:   scheduleBaru.WaktuMulai,
-		WaktuSelesai: scheduleBaru.WaktuSelesai,
-		Kuota:        scheduleBaru.Kuota,
-		UserID:       userid,
-	}
+	var inputProcess = Schedule{PoliKlinik: scheduleBaru.PoliKlinik, Hari: scheduleBaru.Hari,
+		WaktuMulai: scheduleBaru.WaktuMulai, WaktuSelesai: scheduleBaru.WaktuSelesai, Kuota: scheduleBaru.Kuota, UserID: userid}
 	if err := rm.connection.Create(&inputProcess).Error; err != nil {
 		return schedule.Schedule{}, err
 	}
@@ -51,7 +45,7 @@ func (rm *model) UpdateSchedule(userid uint, scheduleID uint, data schedule.Sche
 	return data, nil
 }
 
-func (rm *model) GetScheduleByOwner(userid uint) ([]schedule.Schedule, error) {
+func (rm *model) GetScheduleByOwner(userid uint, poliID int) ([]schedule.Schedule, error) {
 	var result []schedule.Schedule
 	if err := rm.connection.Where("user_id = ?", userid).Find(&result).Error; err != nil {
 		return nil, err
@@ -71,4 +65,12 @@ func (rm *model) DeleteSchedule(userid uint, scheduleID uint) error {
 	}
 
 	return nil
+}
+
+func (rm *model) GetUserByID(userID uint) (schedule.User, error) {
+	var user schedule.User
+	if err := rm.connection.First(&user, userID).Error; err != nil {
+		return schedule.User{}, err
+	}
+	return user, nil
 }
