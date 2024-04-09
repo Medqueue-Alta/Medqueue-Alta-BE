@@ -93,17 +93,27 @@ func (s *service) DeleteReservation(userid *jwt.Token, reservationID uint) error
 
 
 
-func (s *service) GetReservationByOwner(userid *jwt.Token) ([]reservation.Reservation, error) {
-	id := middlewares.DecodeToken(userid)
-	if id == 0 {
-		log.Println("error decode token:", "token tidak ditemukan")
-		return nil, errors.New("data tidak valid")
-	}
-
-	reservations, err := s.m.GetReservationByOwner(id)
+func (s *service) GetAllReservations() ([]reservation.Reservation, error) {
+	reservations, err := s.m.GetAllReservations()
 	if err != nil {
 		return nil, errors.New(helper.ServerGeneralError)
 	}
 
 	return reservations, nil
+}
+
+func (s *service) GetReservationByID(reservationID uint) (*reservation.Reservation, error) {
+	schedule, err := s.m.GetReservationByID(reservationID)
+	if err != nil {
+		return nil, errors.New(helper.ServerGeneralError)
+	}
+	return schedule, nil
+}
+
+func (s *service) GetReservationsByPoliID(poliID uint) ([]reservation.Reservation, error) {
+    schedules, err := s.m.GetReservationsByPoliID(poliID)
+    if err != nil {
+        return nil, errors.New(helper.ServerGeneralError)
+    }
+    return schedules, nil
 }

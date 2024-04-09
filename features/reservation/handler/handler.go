@@ -132,16 +132,9 @@ func (ct *controller) Delete() echo.HandlerFunc {
 }
 
 
-func (ct *controller) ShowMyReservation() echo.HandlerFunc {
+func (ct *controller) ShowAllReservations() echo.HandlerFunc {
     return func(c echo.Context) error {
-
-        token, ok := c.Get("user").(*jwt.Token)
-        if !ok {
-            return c.JSON(http.StatusBadRequest,
-                helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-        }
-
-        reservation, err := ct.s.GetReservationByOwner(token)
+        reservation, err := ct.s.GetAllReservations()
         if err != nil {
             log.Println("gagal mendapat reservasi user:", err.Error())
             return c.JSON(http.StatusInternalServerError,
@@ -150,5 +143,59 @@ func (ct *controller) ShowMyReservation() echo.HandlerFunc {
 
         return c.JSON(http.StatusOK,
             helper.ResponseFormat(http.StatusOK, "reservasi pengguna", reservation))
+    }
+}
+
+func (ct *controller) ShowReservationByID() echo.HandlerFunc {
+    return func(c echo.Context) error {
+        reservationID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+        if err != nil {
+            log.Println("error parsing schedule_id:", err.Error())
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, "ID schedule tidak valid", nil))
+        }
+
+        schedule, err := ct.s.GetReservationByID(uint(reservationID))
+        if err != nil {
+            log.Println("error get post by ID:", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+        }
+
+        if schedule == nil {
+            return c.JSON(http.StatusNotFound,
+                helper.ResponseFormat(http.StatusNotFound, "Schedule tidak ditemukan", nil))
+        }
+
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "Schedule", schedule))
+    }
+}
+
+
+func (ct *controller) ShowReservationsByPoliID() echo.HandlerFunc {
+    return func(c echo.Context) error {
+        // Dapatkan nilai parameter query "poli_id"
+        poliIDStr := c.QueryParam("poli_id")
+
+        // Konversi poliID dari string ke uint
+        poliID, err := strconv.ParseUint(poliIDStr, 10, 64)
+        if err != nil {
+            log.Println("gagal mengonversi poliID menjadi uint64:", err.Error())
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, "Poli ID harus berupa angka", nil))
+        }
+
+        // Panggil service untuk mendapatkan jadwal berdasarkan poliID
+        schedules, err := ct.s.GetReservationsByPoliID(uint(poliID))
+        if err != nil {
+            log.Println("gagal mendapat jadwal untuk poliID", poliID, ":", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+        }
+
+        // Kembalikan jadwal yang sesuai dalam respons
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "Jadwal untuk poliID "+strconv.FormatUint(poliID, 10), schedules))
     }
 }

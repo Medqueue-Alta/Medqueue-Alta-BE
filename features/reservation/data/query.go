@@ -41,9 +41,9 @@ func (rm *model) UpdateReservation(userid uint, reservationID uint, data reserva
 	return data, nil
 }
 
-func (rm *model) GetReservationByOwner(userid uint) ([]reservation.Reservation, error) {
+func (rm *model) GetAllReservations() ([]reservation.Reservation, error) {
 	var result []reservation.Reservation
-	if err := rm.connection.Where("user_id = ?", userid).Find(&result).Error; err != nil {
+	if err := rm.connection.Find(&result).Error; err != nil {
 		return nil, err
 	}
 
@@ -69,4 +69,21 @@ func (rm *model) GetUserByID(userID uint) (reservation.User, error) {
         return reservation.User{}, err
     }
     return user, nil
+}
+
+func (rm *model) GetReservationByID(reservationID uint) (*reservation.Reservation, error) {
+	var result reservation.Reservation
+	if err := rm.connection.Where("id = ?", reservationID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil 
+}
+
+func (rm *model) GetReservationsByPoliID(poliID uint) ([]reservation.Reservation, error) {
+    var result []reservation.Reservation
+    if err := rm.connection.Where("poli_id = ?", poliID).Find(&result).Error; err != nil {
+        return nil, err
+    }
+    return result, nil
 }

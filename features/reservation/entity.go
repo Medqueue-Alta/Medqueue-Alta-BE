@@ -9,22 +9,28 @@ type ReservationController interface {
 	Add() echo.HandlerFunc
 	Update() echo.HandlerFunc
 	Delete() echo.HandlerFunc
-	ShowMyReservation() echo.HandlerFunc
+	ShowAllReservations() echo.HandlerFunc
+	ShowReservationByID() echo.HandlerFunc
+	ShowReservationsByPoliID() echo.HandlerFunc
 }
 
 type ReservationModel interface {
 	AddReservation(userid uint, reservasiBaru Reservation) (Reservation, error)
 	UpdateReservation(userid uint, reservationID uint, data Reservation) (Reservation, error)
 	DeleteReservation(userid uint, reservationID uint) error
-	GetReservationByOwner(userid uint) ([]Reservation, error)
+	GetAllReservations() ([]Reservation, error)
 	GetUserByID(userID uint) (User, error)
+	GetReservationByID(reservationID uint) (*Reservation, error)
+	GetReservationsByPoliID(poliID uint) ([]Reservation, error)
 }
 
 type ReservationService interface {
 	AddReservation(userid *jwt.Token, reservasiBaru Reservation) (Reservation, error)
 	UpdateReservation(userid *jwt.Token, reservationID uint, data Reservation) (Reservation, error)
 	DeleteReservation(userid *jwt.Token, reservationID uint) error
-	GetReservationByOwner(userid *jwt.Token) ([]Reservation, error)
+	GetAllReservations() ([]Reservation, error)
+	GetReservationByID(reservationsID uint) (*Reservation, error)
+	GetReservationsByPoliID(poliID uint) ([]Reservation, error)
 }
 
 type Reservation struct {

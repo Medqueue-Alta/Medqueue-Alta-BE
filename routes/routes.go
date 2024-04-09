@@ -34,9 +34,12 @@ func reservationRoute(c *echo.Echo, rc reservation.ReservationController) {
 	c.POST("/reservations", rc.Add(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
-	c.GET("/reservations", rc.ShowMyReservation(), echojwt.WithConfig(echojwt.Config{
-		SigningKey: []byte(config.JWTSECRET),
-	}))
+	c.GET("/reservations", rc.ShowAllReservations())
+
+	c.GET("/reservations/poli", rc.ShowReservationsByPoliID())
+
+	c.GET("/reservations/:id", rc.ShowReservationByID())
+
 	c.PUT("/reservations/:id", rc.Update(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
