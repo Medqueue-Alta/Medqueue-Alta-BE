@@ -81,3 +81,10 @@ func (rm *model) GetUserByID(userID uint) (schedule.User, error) {
     return user, nil
 }
 
+func (rm *model) GetSchedulesByPoliID(poliID uint) ([]schedule.Schedule, error) {
+    var result []schedule.Schedule
+    if err := rm.connection.Where("poli_id = ?", poliID).Find(&result).Error; err != nil {
+        return nil, err
+    }
+    return result, nil
+}

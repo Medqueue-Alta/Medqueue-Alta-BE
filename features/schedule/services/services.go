@@ -114,3 +114,11 @@ func (s *service) GetScheduleByID(scheduleID uint) (*schedule.Schedule, error) {
 	}
 	return schedule, nil
 }
+
+func (s *service) GetSchedulesByPoliID(poliID uint) ([]schedule.Schedule, error) {
+    schedules, err := s.m.GetSchedulesByPoliID(poliID)
+    if err != nil {
+        return nil, errors.New(helper.ServerGeneralError)
+    }
+    return schedules, nil
+}

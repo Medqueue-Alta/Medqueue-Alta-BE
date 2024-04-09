@@ -20,6 +20,7 @@ type ScheduleModel interface {
 	GetAllSchedules() ([]Schedule, error)
 	GetScheduleByID(scheduleID uint) (*Schedule, error)
 	GetUserByID(userID uint) (User, error)
+	GetSchedulesByPoliID(poliID uint) ([]Schedule, error)
 }
 
 type ScheduleService interface {
@@ -28,6 +29,7 @@ type ScheduleService interface {
 	DeleteSchedule(userid *jwt.Token, scheduleID uint) error
 	GetAllSchedules() ([]Schedule, error)
 	GetScheduleByID(scheduleID uint) (*Schedule, error)
+	GetSchedulesByPoliID(poliID uint) ([]Schedule, error)
 }
 
 type Schedule struct {

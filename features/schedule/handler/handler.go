@@ -171,3 +171,33 @@ func (ct *controller) ShowScheduleByID() echo.HandlerFunc {
             helper.ResponseFormat(http.StatusOK, "Schedule", schedule))
     }
 }
+
+
+func (ct *controller) ShowSchedulesByPoliID() echo.HandlerFunc {
+    return func(c echo.Context) error {
+        // Dapatkan nilai parameter query "poli_id"
+        poliIDStr := c.QueryParam("poli_id")
+
+        // Konversi poliID dari string ke uint
+        poliID, err := strconv.ParseUint(poliIDStr, 10, 64)
+        if err != nil {
+            log.Println("gagal mengonversi poliID menjadi uint64:", err.Error())
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, "Poli ID harus berupa angka", nil))
+        }
+
+        // Panggil service untuk mendapatkan jadwal berdasarkan poliID
+        schedules, err := ct.s.GetSchedulesByPoliID(uint(poliID))
+        if err != nil {
+            log.Println("gagal mendapat jadwal untuk poliID", poliID, ":", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+        }
+
+        // Kembalikan jadwal yang sesuai dalam respons
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "Jadwal untuk poliID "+strconv.FormatUint(poliID, 10), schedules))
+    }
+}
+
+
