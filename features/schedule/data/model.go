@@ -13,6 +13,6 @@ type Schedule struct {
 	Hari 			string
 	WaktuMulai 		string
 	WaktuSelesai 	string
-	Kuota 			string
+	Kuota 			uint
 	Reservations 	[]data.Reservation `gorm:"foreign_key:ScheduleID"`
 }

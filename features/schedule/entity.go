@@ -36,7 +36,7 @@ type Schedule struct {
 	Hari 				string `json:"hari"`
 	WaktuMulai 			string `json:"jam_mulai"`
 	WaktuSelesai		string `json:"jam_selesai"`
-	Kuota	 			string `json:"kuota"`
+	Kuota	 			uint   `json:"kuota"`
 }
 
 type User struct {
