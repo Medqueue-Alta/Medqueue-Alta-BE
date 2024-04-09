@@ -178,6 +178,17 @@ func (ct *controller) ShowReservationsByPoliID() echo.HandlerFunc {
         // Dapatkan nilai parameter query "poli_id"
         poliIDStr := c.QueryParam("poli_id")
 
+        if poliIDStr == "" {
+            schedules, err := ct.s.GetAllReservations()
+            if err != nil {
+                log.Println("gagal mendapatkan semua jadwal:", err.Error())
+                return c.JSON(http.StatusInternalServerError,
+                    helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+            }
+            return c.JSON(http.StatusOK,
+                helper.ResponseFormat(http.StatusOK, "Semua Jadwal", schedules))
+        }
+
         // Konversi poliID dari string ke uint
         poliID, err := strconv.ParseUint(poliIDStr, 10, 64)
         if err != nil {

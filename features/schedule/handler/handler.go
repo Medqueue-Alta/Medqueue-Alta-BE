@@ -178,6 +178,18 @@ func (ct *controller) ShowSchedulesByPoliID() echo.HandlerFunc {
         // Dapatkan nilai parameter query "poli_id"
         poliIDStr := c.QueryParam("poli_id")
 
+        // Jika tidak ada parameter query "poli_id" yang diberikan, kembalikan semua jadwal
+        if poliIDStr == "" {
+            schedules, err := ct.s.GetAllSchedules()
+            if err != nil {
+                log.Println("gagal mendapatkan semua jadwal:", err.Error())
+                return c.JSON(http.StatusInternalServerError,
+                    helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+            }
+            return c.JSON(http.StatusOK,
+                helper.ResponseFormat(http.StatusOK, "Semua Jadwal", schedules))
+        }
+
         // Konversi poliID dari string ke uint
         poliID, err := strconv.ParseUint(poliIDStr, 10, 64)
         if err != nil {
