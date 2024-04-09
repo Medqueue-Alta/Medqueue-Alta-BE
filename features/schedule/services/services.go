@@ -95,17 +95,14 @@ func (s *service) DeleteSchedule(userid *jwt.Token, scheduleID uint) error {
 	return nil
 }
 
-func (s *service) GetScheduleByOwner(userid *jwt.Token, poliID int) ([]schedule.Schedule, error) {
-	id := middlewares.DecodeToken(userid)
-	if id == 0 {
-		log.Println("error decode token:", "token tidak ditemukan")
-		return nil, errors.New("data tidak valid")
-	}
-
-	reservations, err := s.m.GetScheduleByOwner(id, poliID)
+func (s *service) GetSchedulesByPoliklinik(poliklinik int) ([]schedule.Schedule, error) {
+	// Call the model's method to get schedules by poliklinik
+	reservations, err := s.m.GetSchedulesByPoliklinik(poliklinik)
 	if err != nil {
+		log.Println("failed to get schedules by poliklinik:", err.Error())
 		return nil, errors.New(helper.ServerGeneralError)
 	}
 
+	// Return the retrieved schedules
 	return reservations, nil
 }

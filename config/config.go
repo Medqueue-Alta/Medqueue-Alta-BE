@@ -80,7 +80,5 @@ func InitSQL(c AppConfig) *gorm.DB {
 
 	db.AutoMigrate(&user.User{}, &reservation.Reservation{}, &schedule.Schedule{})
 
-	seedAdmin(db)
-
 	return db
 }
