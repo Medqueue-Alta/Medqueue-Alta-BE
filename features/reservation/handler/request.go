@@ -1,8 +1,9 @@
 package handler
 
 type ReservationRequest struct {
-	PoliKlinik    string `json:"poli" form:"poli"`
+	PoliID        uint   `json:"poli_id" form:"poli_id"`
 	TanggalDaftar string `json:"tanggal_kunjungan" form:"tanggal_kunjungan"`
-	Jadwal        string `json:"jadwal" form:"jadwal"`
+	ScheduleID    uint   `json:"schedule_id" form:"schedule_id"`
 	Keluhan       string `json:"keluhan" form:"keluhan"`
+	Bpjs          bool   `json:"bpjs" form:"bpjs"`
 }

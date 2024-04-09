@@ -29,10 +29,12 @@ type ReservationService interface {
 
 type Reservation struct {
 	ID 					uint   `json:"reservations_id"`
-	PoliKlinik 			string `json:"poli"`
+	ScheduleID			uint   `json:"id_jadwal"`
+	PoliID 			    uint   `json:"poli_id"`
 	TanggalDaftar 		string `form:"tanggal_kunjungan" json:"tanggal_kunjungan"`
-	Jadwal 				string `json:"id_jadwal"`
 	Keluhan 			string `json:"keluhan"`
+	Bpjs 				bool   `json:"bpjs"`
+	Status				string `gorm:"default:waiting" json:"status"`
 }
 
 type User struct {

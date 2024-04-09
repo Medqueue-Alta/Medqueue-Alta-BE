@@ -49,7 +49,11 @@ func scheduleRoute(c *echo.Echo, sc schedule.ScheduleController) {
 	c.POST("/schedules", sc.Add(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
-	c.GET("/schedules", sc.ShowMySchedule())
+
+	c.GET("/schedules", sc.ShowAllSchedules())
+
+	c.GET("/schedules/:id", sc.ShowScheduleByID())
+
 	c.PUT("/schedules/:id", sc.Update(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))

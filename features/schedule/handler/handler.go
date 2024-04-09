@@ -47,7 +47,7 @@ func (ct *controller) Add() echo.HandlerFunc {
 		inputProcess.Hari = input.Hari
 		inputProcess.WaktuMulai = input.WaktuMulai
 		inputProcess.WaktuSelesai = input.WaktuSelesai
-		inputProcess.Kuota = input.Kuota
+        inputProcess.Kuota = input.Kuota
 		result, err := ct.s.AddSchedule(token, inputProcess)
 		if err != nil {
 			log.Println("error insert db:", err.Error())
@@ -59,99 +59,115 @@ func (ct *controller) Add() echo.HandlerFunc {
 }
 
 func (ct *controller) Update() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		idStr := c.Param("id")
-		id, err := strconv.ParseUint(idStr, 10, 64)
-		if err != nil {
-			log.Println("error parsing ID:", err.Error())
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
+    return func(c echo.Context) error {
+        idStr := c.Param("id")
+        id, err := strconv.ParseUint(idStr, 10, 64)
+        if err != nil {
+            log.Println("error parsing ID:", err.Error())
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+        }
 
-		var input ScheduleRequest
-		if err := c.Bind(&input); err != nil {
-			log.Println("error bind data:", err.Error())
-			if strings.Contains(err.Error(), "unsupported") {
-				return c.JSON(http.StatusUnsupportedMediaType,
-					helper.ResponseFormat(http.StatusUnsupportedMediaType, helper.UserInputFormatError, nil))
-			}
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
+        var input ScheduleRequest
+        if err := c.Bind(&input); err != nil {
+            log.Println("error bind data:", err.Error())
+            if strings.Contains(err.Error(), "unsupported") {
+                return c.JSON(http.StatusUnsupportedMediaType,
+                    helper.ResponseFormat(http.StatusUnsupportedMediaType, helper.UserInputFormatError, nil))
+            }
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+        }
 
-		token, ok := c.Get("user").(*jwt.Token)
-		if !ok {
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
+        token, ok := c.Get("user").(*jwt.Token)
+        if !ok {
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+        }
 
-		updatedSchedule, err := ct.s.UpdateSchedule(token, uint(id), schedule.Schedule{
-			PoliID:       input.PoliID,
-			Hari:         input.Hari,
-			WaktuMulai:   input.WaktuMulai,
+        updatedSchedule, err := ct.s.UpdateSchedule(token, uint(id), schedule.Schedule{
+            PoliID:     input.PoliID,
+			Hari: input.Hari,
+			WaktuMulai: input.WaktuMulai,
 			WaktuSelesai: input.WaktuSelesai,
-			Kuota:        input.Kuota,
-		})
-		if err != nil {
-			log.Println("gagal update:", err.Error())
-			return c.JSON(http.StatusInternalServerError,
-				helper.ResponseFormat(http.StatusForbidden, "gagal update", nil))
-		}
+            Kuota: input.Kuota,
+        })
+        if err != nil {
+            log.Println("gagal update:", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusForbidden, "gagal update", nil))
+        }
 
-		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "berhasil diperbarui", updatedSchedule))
-	}
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "berhasil diperbarui", updatedSchedule))
+    }
 }
 
 func (ct *controller) Delete() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		idStr := c.Param("id")
-		id, err := strconv.ParseUint(idStr, 10, 64)
-		if err != nil {
-			log.Println("error parsing ID:", err.Error())
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
+    return func(c echo.Context) error {
+        idStr := c.Param("id")
+        id, err := strconv.ParseUint(idStr, 10, 64)
+        if err != nil {
+            log.Println("error parsing ID:", err.Error())
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+        }
 
-		token, ok := c.Get("user").(*jwt.Token)
-		if !ok {
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
+        token, ok := c.Get("user").(*jwt.Token)
+        if !ok {
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+        }
 
-		err = ct.s.DeleteSchedule(token, uint(id))
-		if err != nil {
-			log.Println("gagal menghapus:", err.Error())
-			return c.JSON(http.StatusInternalServerError,
-				helper.ResponseFormat(http.StatusForbidden, "gagal menghapus", nil))
-		}
+        err = ct.s.DeleteSchedule(token, uint(id))
+        if err != nil {
+            log.Println("gagal menghapus:", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusForbidden, "gagal menghapus", nil))
+        }
 
-		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "berhasil dihapus", nil))
-	}
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "berhasil dihapus", nil))
+    }
 }
 
-func (ct *controller) ShowMySchedule() echo.HandlerFunc {
-	return func(c echo.Context) error {
 
-		// Parse poliklinik from query parameter
-		poliklinik, err := strconv.Atoi(c.QueryParam("poli_id"))
-		if err != nil {
-			log.Println("failed to parse poliklinik:", err.Error())
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
+func (ct *controller) ShowAllSchedules() echo.HandlerFunc {
+    return func(c echo.Context) error {
+        schedule, err := ct.s.GetAllSchedules()
+        if err != nil {
+            log.Println("gagal mendapat schedule user:", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+        }
 
-		// Call the service method to get schedules based on user and poliklinik
-		schedules, err := ct.s.GetSchedulesByPoliklinik(poliklinik)
-		if err != nil {
-			log.Println("failed to get user's schedule:", err.Error())
-			return c.JSON(http.StatusInternalServerError,
-				helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
-		}
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "schedule pengguna", schedule))
+    }
+}
 
-		// Return the schedules as a JSON response
-		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "user's schedules", schedules))
-	}
+func (ct *controller) ShowScheduleByID() echo.HandlerFunc {
+    return func(c echo.Context) error {
+        scheduleID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+        if err != nil {
+            log.Println("error parsing schedule_id:", err.Error())
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, "ID schedule tidak valid", nil))
+        }
+
+        schedule, err := ct.s.GetScheduleByID(uint(scheduleID))
+        if err != nil {
+            log.Println("error get post by ID:", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+        }
+
+        if schedule == nil {
+            return c.JSON(http.StatusNotFound,
+                helper.ResponseFormat(http.StatusNotFound, "Schedule tidak ditemukan", nil))
+        }
+
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "Schedule", schedule))
+    }
 }

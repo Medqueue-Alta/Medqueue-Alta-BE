@@ -11,15 +11,6 @@ type model struct {
 	connection *gorm.DB
 }
 
-func (rm *model) GetSchedulesByPoliklinik(poliklinik int) ([]schedule.Schedule, error) {
-	var result []schedule.Schedule
-	if err := rm.connection.Where("Poli_id = ?", poliklinik).Find(&result).Error; err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
 func New(db *gorm.DB) schedule.ScheduleModel {
 	return &model{
 		connection: db,
@@ -27,23 +18,15 @@ func New(db *gorm.DB) schedule.ScheduleModel {
 }
 
 func (rm *model) AddSchedule(userid uint, scheduleBaru schedule.Schedule) (schedule.Schedule, error) {
-	var inputProcess = Schedule{
-		PoliID:       scheduleBaru.PoliID,
-		Hari:         scheduleBaru.Hari,
-		WaktuMulai:   scheduleBaru.WaktuMulai,
-		WaktuSelesai: scheduleBaru.WaktuSelesai,
-		Kuota:        scheduleBaru.Kuota,
-		UserID:       userid}
+	var inputProcess = Schedule{PoliID: scheduleBaru.PoliID, Hari: scheduleBaru.Hari, 
+		WaktuMulai: scheduleBaru.WaktuMulai, WaktuSelesai: scheduleBaru.WaktuSelesai, Kuota: scheduleBaru.Kuota,UserID : userid}
 	if err := rm.connection.Create(&inputProcess).Error; err != nil {
 		return schedule.Schedule{}, err
 	}
 
-	return schedule.Schedule{
-		PoliID:       inputProcess.PoliID,
-		Hari:         inputProcess.Hari,
-		WaktuMulai:   inputProcess.WaktuMulai,
-		WaktuSelesai: inputProcess.WaktuSelesai,
-		Kuota:        inputProcess.Kuota}, nil
+	return schedule.Schedule{PoliID: inputProcess.PoliID, Hari: inputProcess.Hari,
+		WaktuMulai: inputProcess.WaktuMulai, WaktuSelesai: inputProcess.WaktuSelesai,
+		Kuota: inputProcess.Kuota}, nil
 }
 
 func (rm *model) UpdateSchedule(userid uint, scheduleID uint, data schedule.Schedule) (schedule.Schedule, error) {
@@ -59,32 +42,42 @@ func (rm *model) UpdateSchedule(userid uint, scheduleID uint, data schedule.Sche
 	return data, nil
 }
 
-func (rm *model) GetScheduleByOwner(userid uint) ([]schedule.Schedule, error) {
+func (rm *model) GetAllSchedules() ([]schedule.Schedule, error) {
 	var result []schedule.Schedule
-	if err := rm.connection.Where("user_id = ?", userid).Find(&result).Error; err != nil {
+	if err := rm.connection.Find(&result).Error; err != nil {
 		return nil, err
 	}
 
 	return result, nil
 }
 
+func (rm *model) GetScheduleByID(scheduleID uint) (*schedule.Schedule, error) {
+	var result schedule.Schedule
+	if err := rm.connection.Where("id = ?", scheduleID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil 
+}
+
 func (rm *model) DeleteSchedule(userid uint, scheduleID uint) error {
-	result := rm.connection.Unscoped().Where("user_id = ? AND id = ?", userid, scheduleID).Delete(&Schedule{})
-	if result.Error != nil {
-		return result.Error
-	}
+    result := rm.connection.Unscoped().Where("user_id = ? AND id = ?", userid, scheduleID).Delete(&Schedule{})
+    if result.Error != nil {
+        return result.Error
+    }
 
-	if result.RowsAffected == 0 {
-		return errors.New("no data affected")
-	}
+    if result.RowsAffected == 0 {
+        return errors.New("no data affected")
+    }
 
-	return nil
+    return nil
 }
 
 func (rm *model) GetUserByID(userID uint) (schedule.User, error) {
-	var user schedule.User
-	if err := rm.connection.First(&user, userID).Error; err != nil {
-		return schedule.User{}, err
-	}
-	return user, nil
+    var user schedule.User
+    if err := rm.connection.First(&user, userID).Error; err != nil {
+        return schedule.User{}, err
+    }
+    return user, nil
 }
+

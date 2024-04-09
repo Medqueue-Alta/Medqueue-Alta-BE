@@ -12,25 +12,25 @@ import (
 )
 
 type service struct {
-	model user.UserModel
-	pm    helper.PasswordManager
-	v     *validator.Validate
+	model 	user.UserModel
+	pm 		helper.PasswordManager
+	v 		*validator.Validate
 }
 
 func NewService(m user.UserModel) user.UserService {
 	return &service{
-		model: m,
-		pm:    helper.NewPasswordManager(),
-		v:     validator.New(),
+		model: 	m,
+		pm:		helper.NewPasswordManager(),
+		v:		validator.New(),
 	}
 }
 
 func (s *service) Register(newData user.User) error {
 	var registerValidate user.Register
-	registerValidate.Nama = newData.Nama
-	registerValidate.Email = newData.Email
+    registerValidate.Nama = newData.Nama
+    registerValidate.Email = newData.Email
 	registerValidate.Password = newData.Password
-	registerValidate.TempatLahir = newData.TempatLahir
+    registerValidate.TempatLahir = newData.TempatLahir
 	registerValidate.TanggalLahir = newData.TanggalLahir
 	registerValidate.JenisKelamin = newData.JenisKelamin
 	registerValidate.GolonganDarah = newData.GolonganDarah
@@ -67,7 +67,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 
 	dbData, err := s.model.Login(loginValidate.Email)
 	if err != nil {
-		return user.User{}, "", err
+		return user.User{}, "",err
 	}
 
 	err = s.pm.ComparePassword(loginValidate.Password, dbData.Password)
@@ -94,76 +94,77 @@ func (s *service) Profile(token *jwt.Token) (user.User, error) {
 }
 
 func (s *service) Update(token *jwt.Token, newData user.User) (user.User, error) {
-	decodedID := middlewares.DecodeToken(token)
+    decodedID := middlewares.DecodeToken(token)
 
-	existingUser, err := s.model.GetUserByID(decodedID)
-	if err != nil {
-		return user.User{}, errors.New("user not found")
-	}
+    existingUser, err := s.model.GetUserByID(decodedID)
+    if err != nil {
+        return user.User{}, errors.New("user not found")
+    }
 
-	if newData.Nama != "" {
-		existingUser.Nama = newData.Nama
-	}
+    if newData.Nama != "" {
+        existingUser.Nama = newData.Nama
+    }
 
-	if newData.Email != "" {
-		existingUser.Email = newData.Email
-	}
+    if newData.Email != "" {
+        existingUser.Email = newData.Email
+    }
 
-	if newData.Password != "" {
-		newPassword, err := s.pm.HashPassword(newData.Password)
-		if err != nil {
-			return user.User{}, errors.New(helper.ServiceGeneralError)
-		}
-		existingUser.Password = newPassword
-	}
+    if newData.Password != "" {
+        newPassword, err := s.pm.HashPassword(newData.Password)
+        if err != nil {
+            return user.User{}, errors.New(helper.ServiceGeneralError)
+        }
+        existingUser.Password = newPassword
+    }
 
-	if newData.TanggalLahir != "" {
-		existingUser.TempatLahir = newData.TempatLahir
-	}
+    if newData.TanggalLahir != "" {
+        existingUser.TempatLahir = newData.TempatLahir
+    }
 
-	if newData.TanggalLahir != "" {
-		existingUser.TanggalLahir = newData.TanggalLahir
-	}
+    if newData.TanggalLahir != "" {
+        existingUser.TanggalLahir = newData.TanggalLahir
+    }
 
-	if newData.JenisKelamin != "" {
-		existingUser.JenisKelamin = newData.JenisKelamin
-	}
+    if newData.JenisKelamin != "" {
+        existingUser.JenisKelamin = newData.JenisKelamin
+    }
 
-	if newData.GolonganDarah != "" {
-		existingUser.GolonganDarah = newData.GolonganDarah
-	}
+    if newData.GolonganDarah != "" {
+        existingUser.GolonganDarah = newData.GolonganDarah
+    }
 
-	if newData.NIK != "" {
-		existingUser.NIK = newData.NIK
-	}
+    if newData.NIK != "" {
+        existingUser.NIK = newData.NIK
+    }
 
-	if newData.NoBPJS != "" {
-		existingUser.NoBPJS = newData.NoBPJS
-	}
+    if newData.NoBPJS != "" {
+        existingUser.NoBPJS = newData.NoBPJS
+    }
 
-	if newData.NoTelepon != "" {
-		existingUser.NoTelepon = newData.NoTelepon
-	}
+    if newData.NoTelepon != "" {
+        existingUser.NoTelepon = newData.NoTelepon
+    }
 
-	result, err := s.model.Update(decodedID, existingUser)
-	if err != nil {
-		return user.User{}, err
-	}
+    result, err := s.model.Update(decodedID, existingUser)
+    if err != nil {
+        return user.User{}, err
+    }
 
-	return result, nil
+    return result, nil
 }
 
+
 func (s *service) Delete(token *jwt.Token) error {
-	decodedID := middlewares.DecodeToken(token)
-	if decodedID == 0 {
-		log.Println("error decode token:", "token tidak ditemukan")
-		return errors.New("data tidak valid")
-	}
+    decodedID := middlewares.DecodeToken(token)
+    if decodedID == 0 {
+        log.Println("error decode token:", "token tidak ditemukan")
+        return errors.New("data tidak valid")
+    }
 
-	err := s.model.Delete(decodedID)
-	if err != nil {
-		return errors.New("data berhasil dihapus")
-	}
+    err := s.model.Delete(decodedID)
+    if err != nil {
+        return errors.New("data berhasil dihapus")
+    }
 
-	return nil
+    return nil
 }

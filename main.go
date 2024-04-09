@@ -36,7 +36,7 @@ func main() {
 
 	e.Pre(middleware.RemoveTrailingSlash())
 	e.Use(middleware.Logger())
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORS()) 
 	routes.InitRoute(e, userHandler, reservationHandler, scheduleHandler)
 	e.Logger.Fatal(e.Start(":1323"))
 }

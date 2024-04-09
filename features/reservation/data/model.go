@@ -4,10 +4,11 @@ import "gorm.io/gorm"
 
 type Reservation struct {
 	gorm.Model
-	UserID        uint
-	PoliKlinik    string
-	TanggalDaftar string
-	Jadwal        string
-	Keluhan       string
-	Bpjs          bool
+	UserID 				uint
+	ScheduleID			uint
+	PoliID 			    uint
+	TanggalDaftar 		string
+	Keluhan 			string
+	Bpjs				bool
+	Status				string `gorm:"default:waiting"`
 }

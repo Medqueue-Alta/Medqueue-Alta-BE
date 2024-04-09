@@ -10,7 +10,7 @@ type UserController interface {
 	Login() echo.HandlerFunc
 	Profile() echo.HandlerFunc
 	Update() echo.HandlerFunc
-	Delete() echo.HandlerFunc
+	Delete() echo.HandlerFunc 
 }
 
 type UserService interface {
@@ -27,38 +27,37 @@ type UserModel interface {
 	GetUserByID(id uint) (User, error)
 	Update(id uint, newData User) (User, error)
 	Delete(id uint) error
-	GetUserByEmail(email string) (User, error)
 }
 
 type User struct {
-	ID            uint   `json:"id"`
-	Role          string `gorm:"default:pasien" json:"role"`
-	Nama          string `form:"nama" json:"nama"`
-	Email         string `form:"email" json:"email"`
-	Password      string `form:"password" json:"password"`
-	TempatLahir   string `form:"tempat_lahir" json:"tempat_lahir"`
-	TanggalLahir  string `form:"tgl_lahir" json:"tgl_lahir"`
-	JenisKelamin  string `form:"gender" json:"gender"`
-	GolonganDarah string `form:"gol_darah" json:"gol_darah"`
-	NIK           string `form:"no_nik" json:"no_nik"`
-	NoBPJS        string `form:"no_bpjs" json:"no_bpjs"`
-	NoTelepon     string `form:"no_telepon" json:"no_telepon"`
+	ID 				uint		`json:"id"`
+	Role			string		`gorm:"default:pasien" json:"role"`
+	Nama 			string		`form:"nama" json:"nama"`
+	Email 			string		`form:"email" json:"email"`
+	Password 		string		`form:"password" json:"password"`
+	TempatLahir 	string		`form:"tempat_lahir" json:"tempat_lahir"`
+	TanggalLahir 	string		`form:"tgl_lahir" json:"tgl_lahir"`
+	JenisKelamin 	string		`form:"gender" json:"gender"`
+	GolonganDarah 	string		`form:"gol_darah" json:"gol_darah"`
+	NIK 			string		`form:"no_nik" json:"no_nik"`
+	NoBPJS 			string		`form:"no_bpjs" json:"no_bpjs"`
+	NoTelepon 		string		`form:"no_telepon" json:"no_telepon"`
 }
 
 type Login struct {
-	Email    string `json:"email" form:"email" validate:"required"`
-	Password string `json:"password" form:"password" validate:"required,alphanum,min=8"`
+	Email 		string `json:"email" form:"email" validate:"required"`
+	Password 	string `json:"password" form:"password" validate:"required,alphanum,min=8"`
 }
 
 type Register struct {
-	Nama          string `form:"nama" json:"nama" validate:"required"`
-	Email         string `form:"email" json:"email" validate:"required"`
-	Password      string `form:"password" json:"password" validate:"required"`
-	TempatLahir   string `form:"tempat_lahir" json:"tempat_lahir" validate:"required"`
-	TanggalLahir  string `form:"tanggal_lahir" json:"tanggal_lahir" validate:"required"`
-	JenisKelamin  string `form:"jenis_kelamin" json:"jenis_kelamin" validate:"required"`
-	GolonganDarah string `form:"golongan_darah" json:"golongan_darah"`
-	NIK           string `form:"nik" json:"nik" validate:"required"`
-	NoBPJS        string `form:"no_bpjs" json:"no_bpjs"`
-	NoTelepon     string `form:"no_telepon" json:"no_telepon" validate:"required"`
+	Nama 			string		`form:"nama" json:"nama" validate:"required"`
+	Email 			string		`form:"email" json:"email" validate:"required"`
+	Password 		string		`form:"password" json:"password" validate:"required"`
+	TempatLahir 	string		`form:"tempat_lahir" json:"tempat_lahir" validate:"required"`
+	TanggalLahir 	string		`form:"tgl_lahir" json:"tgl_lahir" validate:"required"`
+	JenisKelamin 	string		`form:"gender" json:"gender" validate:"required"`
+	GolonganDarah 	string		`form:"gol_darah" json:"gol_darah"`
+	NIK 			string		`form:"no_nik" json:"no_nik" validate:"required"`
+	NoBPJS 			string		`form:"no_bpjs" json:"no_bpjs"`
+	NoTelepon 		string		`form:"no_telepon" json:"no_telepon" validate:"required"`
 }
