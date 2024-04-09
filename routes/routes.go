@@ -50,7 +50,7 @@ func scheduleRoute(c *echo.Echo, sc schedule.ScheduleController) {
 		SigningKey: []byte(config.JWTSECRET),
 	}))
 
-	c.GET("/schedules", sc.ShowAllSchedules())
+	c.GET("/schedules", sc.ShowAllSchedulesAndSchedulesByPoliID())
 
 	c.GET("/schedules/:id", sc.ShowScheduleByID())
 

@@ -11,6 +11,7 @@ type ScheduleController interface {
 	Delete() echo.HandlerFunc
 	ShowAllSchedules() echo.HandlerFunc
 	ShowScheduleByID() echo.HandlerFunc
+	ShowAllSchedulesAndSchedulesByPoliID() echo.HandlerFunc
 }
 
 type ScheduleModel interface {

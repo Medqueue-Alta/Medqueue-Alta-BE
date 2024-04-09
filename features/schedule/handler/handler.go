@@ -200,4 +200,16 @@ func (ct *controller) ShowSchedulesByPoliID() echo.HandlerFunc {
     }
 }
 
+func (ct *controller) ShowAllSchedulesAndSchedulesByPoliID() echo.HandlerFunc {
+    return func(c echo.Context) error {
+        // Panggil fungsi handler ShowAllSchedules
+        err := ct.ShowAllSchedules()(c)
+        if err != nil {
+            return err // jika terjadi kesalahan, kembalikan kesalahan
+        }
+
+        // Panggil fungsi handler ShowSchedulesByPoliID
+        return ct.ShowSchedulesByPoliID()(c)
+    }
+}
 
