@@ -16,21 +16,21 @@ type ScheduleModel interface {
 	AddSchedule(userid uint, scheduleBaru Schedule) (Schedule, error)
 	UpdateSchedule(userid uint, scheduleID uint, data Schedule) (Schedule, error)
 	DeleteSchedule(userid uint, scheduleID uint) error
-	GetScheduleByOwner(userid uint, poliID int) ([]Schedule, error)
+	GetSchedulesByPoliklinik(poliklinik int) ([]Schedule, error)
 	GetUserByID(userID uint) (User, error)
+	GetScheduleByOwner(userid uint) ([]Schedule, error)
 }
 
 type ScheduleService interface {
 	AddSchedule(userid *jwt.Token, scheduleBaru Schedule) (Schedule, error)
 	UpdateSchedule(userid *jwt.Token, scheduleID uint, data Schedule) (Schedule, error)
 	DeleteSchedule(userid *jwt.Token, scheduleID uint) error
-	GetScheduleByOwner(userid *jwt.Token, poliID int) ([]Schedule, error)
+	GetSchedulesByPoliklinik(poliklinik int) ([]Schedule, error)
 }
 
 type Schedule struct {
 	ID           uint   `json:"schedule_id"`
 	PoliID       int    `json:"poli_id"`
-	PoliKlinik   string `json:"poli"`
 	Hari         string `json:"hari"`
 	WaktuMulai   string `json:"jam_mulai"`
 	WaktuSelesai string `json:"jam_selesai"`

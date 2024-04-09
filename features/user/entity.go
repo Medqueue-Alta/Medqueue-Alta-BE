@@ -57,8 +57,8 @@ type Register struct {
 	TempatLahir   string `form:"tempat_lahir" json:"tempat_lahir" validate:"required"`
 	TanggalLahir  string `form:"tanggal_lahir" json:"tanggal_lahir" validate:"required"`
 	JenisKelamin  string `form:"jenis_kelamin" json:"jenis_kelamin" validate:"required"`
-	GolonganDarah string `form:"golongan_darah" json:"golongan_darah" validate:"required"`
+	GolonganDarah string `form:"golongan_darah" json:"golongan_darah"`
 	NIK           string `form:"nik" json:"nik" validate:"required"`
-	NoBPJS        string `form:"no_bpjs" json:"no_bpjs" validate:"required"`
+	NoBPJS        string `form:"no_bpjs" json:"no_bpjs"`
 	NoTelepon     string `form:"no_telepon" json:"no_telepon" validate:"required"`
 }

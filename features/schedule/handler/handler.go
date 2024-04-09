@@ -3,7 +3,6 @@ package handler
 import (
 	"Medqueue-Alta-BE/features/schedule"
 	"Medqueue-Alta-BE/helper"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,9 +21,6 @@ func NewHandler(service schedule.ScheduleService) schedule.ScheduleController {
 		s: service,
 	}
 }
-
-var poliIDMap = make(map[string]int)
-var lastAssignPoliID int = 0
 
 func (ct *controller) Add() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -46,16 +42,8 @@ func (ct *controller) Add() echo.HandlerFunc {
 				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
-		poliID, exist := poliIDMap[input.PoliKlinik]
-		if !exist {
-			lastAssignPoliID++
-			poliID = lastAssignPoliID
-			poliIDMap[input.PoliKlinik] = poliID
-		}
-
 		var inputProcess schedule.Schedule
-		inputProcess.PoliID = poliID
-		inputProcess.PoliKlinik = input.PoliKlinik
+		inputProcess.PoliID = input.PoliID
 		inputProcess.Hari = input.Hari
 		inputProcess.WaktuMulai = input.WaktuMulai
 		inputProcess.WaktuSelesai = input.WaktuSelesai
@@ -65,7 +53,6 @@ func (ct *controller) Add() echo.HandlerFunc {
 			log.Println("error insert db:", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
-		fmt.Println(poliID)
 
 		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "berhasil menambahkan schedule", result))
 	}
@@ -99,7 +86,7 @@ func (ct *controller) Update() echo.HandlerFunc {
 		}
 
 		updatedSchedule, err := ct.s.UpdateSchedule(token, uint(id), schedule.Schedule{
-			PoliKlinik:   input.PoliKlinik,
+			PoliID:       input.PoliID,
 			Hari:         input.Hari,
 			WaktuMulai:   input.WaktuMulai,
 			WaktuSelesai: input.WaktuSelesai,
@@ -146,29 +133,23 @@ func (ct *controller) Delete() echo.HandlerFunc {
 
 func (ct *controller) ShowMySchedule() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// Retrieve JWT token from request context
-		token, ok := c.Get("user").(*jwt.Token)
-		if !ok {
-			return c.JSON(http.StatusBadRequest,
-				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
-		}
 
-		// Parse poliID from query parameter
-		poliID, err := strconv.Atoi(c.QueryParam("poliID"))
+		// Parse poliklinik from query parameter
+		poliklinik, err := strconv.Atoi(c.QueryParam("poli_id"))
 		if err != nil {
-			log.Println("failed to parse poliID:", err.Error())
+			log.Println("failed to parse poliklinik:", err.Error())
 			return c.JSON(http.StatusBadRequest,
 				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
-		// Call the service method to get schedules based on user and poliID
-		schedules, err := ct.s.GetScheduleByOwner(token, poliID)
+		// Call the service method to get schedules based on user and poliklinik
+		schedules, err := ct.s.GetSchedulesByPoliklinik(poliklinik)
 		if err != nil {
 			log.Println("failed to get user's schedule:", err.Error())
 			return c.JSON(http.StatusInternalServerError,
 				helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
-		fmt.Println(poliID)
+
 		// Return the schedules as a JSON response
 		return c.JSON(http.StatusOK,
 			helper.ResponseFormat(http.StatusOK, "user's schedules", schedules))

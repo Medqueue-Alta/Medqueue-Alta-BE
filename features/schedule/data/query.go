@@ -11,6 +11,15 @@ type model struct {
 	connection *gorm.DB
 }
 
+func (rm *model) GetSchedulesByPoliklinik(poliklinik int) ([]schedule.Schedule, error) {
+	var result []schedule.Schedule
+	if err := rm.connection.Where("Poli_id = ?", poliklinik).Find(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func New(db *gorm.DB) schedule.ScheduleModel {
 	return &model{
 		connection: db,
@@ -18,14 +27,19 @@ func New(db *gorm.DB) schedule.ScheduleModel {
 }
 
 func (rm *model) AddSchedule(userid uint, scheduleBaru schedule.Schedule) (schedule.Schedule, error) {
-	var inputProcess = Schedule{PoliKlinik: scheduleBaru.PoliKlinik, Hari: scheduleBaru.Hari,
-		WaktuMulai: scheduleBaru.WaktuMulai, WaktuSelesai: scheduleBaru.WaktuSelesai, Kuota: scheduleBaru.Kuota, UserID: userid}
+	var inputProcess = Schedule{
+		PoliID:       scheduleBaru.PoliID,
+		Hari:         scheduleBaru.Hari,
+		WaktuMulai:   scheduleBaru.WaktuMulai,
+		WaktuSelesai: scheduleBaru.WaktuSelesai,
+		Kuota:        scheduleBaru.Kuota,
+		UserID:       userid}
 	if err := rm.connection.Create(&inputProcess).Error; err != nil {
 		return schedule.Schedule{}, err
 	}
 
 	return schedule.Schedule{
-		PoliKlinik:   inputProcess.PoliKlinik,
+		PoliID:       inputProcess.PoliID,
 		Hari:         inputProcess.Hari,
 		WaktuMulai:   inputProcess.WaktuMulai,
 		WaktuSelesai: inputProcess.WaktuSelesai,
@@ -45,7 +59,7 @@ func (rm *model) UpdateSchedule(userid uint, scheduleID uint, data schedule.Sche
 	return data, nil
 }
 
-func (rm *model) GetScheduleByOwner(userid uint, poliID int) ([]schedule.Schedule, error) {
+func (rm *model) GetScheduleByOwner(userid uint) ([]schedule.Schedule, error) {
 	var result []schedule.Schedule
 	if err := rm.connection.Where("user_id = ?", userid).Find(&result).Error; err != nil {
 		return nil, err
