@@ -3,6 +3,7 @@ package handler
 import (
 	"Medqueue-Alta-BE/features/reservation"
 	"Medqueue-Alta-BE/helper"
+	"Medqueue-Alta-BE/middlewares"
 	"log"
 	"net/http"
 	"strconv"
@@ -42,12 +43,16 @@ func (ct *controller) Add() echo.HandlerFunc {
 				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
+        _, _, nama := middlewares.DecodeToken(token)
+
 		var inputProcess reservation.Reservation
 		inputProcess.PoliID = input.PoliID
 		inputProcess.TanggalDaftar = input.TanggalDaftar
 		inputProcess.ScheduleID = input.ScheduleID
 		inputProcess.Keluhan = input.Keluhan
         inputProcess.Bpjs = input.Bpjs
+        inputProcess.Status = "waiting"
+        inputProcess.Nama = nama
 		result, err := ct.s.AddReservation(token, inputProcess)
 		if err != nil {
 			log.Println("error insert db:", err.Error())

@@ -73,13 +73,6 @@ func (rm *model) DeleteSchedule(userid uint, scheduleID uint) error {
     return nil
 }
 
-func (rm *model) GetUserByID(userID uint) (schedule.User, error) {
-    var user schedule.User
-    if err := rm.connection.First(&user, userID).Error; err != nil {
-        return schedule.User{}, err
-    }
-    return user, nil
-}
 
 func (rm *model) GetSchedulesByPoliID(poliID uint) ([]schedule.Schedule, error) {
     var result []schedule.Schedule

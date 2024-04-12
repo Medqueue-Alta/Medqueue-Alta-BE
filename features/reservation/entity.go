@@ -15,11 +15,10 @@ type ReservationController interface {
 }
 
 type ReservationModel interface {
-	AddReservation(userid uint, reservasiBaru Reservation) (Reservation, error)
+	AddReservation(userid uint, reservasiBaru Reservation, nama string) (Reservation, error)
 	UpdateReservation(userid uint, reservationID uint, data Reservation) (Reservation, error)
 	DeleteReservation(userid uint, reservationID uint) error
 	GetAllReservations() ([]Reservation, error)
-	GetUserByID(userID uint) (User, error)
 	GetReservationByID(reservationID uint) (*Reservation, error)
 	GetReservationsByPoliID(poliID uint) ([]Reservation, error)
 }
@@ -35,17 +34,12 @@ type ReservationService interface {
 
 type Reservation struct {
 	ID 					uint   `json:"reservations_id"`
+	UserID				uint   `json:"user_id"`
+	Nama				string `json:"nama"`
 	ScheduleID			uint   `json:"id_jadwal"`
 	PoliID 			    uint   `json:"poli_id"`
 	TanggalDaftar 		string `form:"tanggal_kunjungan" json:"tanggal_kunjungan"`
 	Keluhan 			string `json:"keluhan"`
 	Bpjs 				bool   `json:"bpjs"`
 	Status				string `gorm:"default:waiting" json:"status"`
-}
-
-type User struct {
-	ID 				uint		`json:"id"`
-	Role			string		`json:"role"`
-	Nama 			string		`json:"nama"`
-	Email 			string		`json:"email"`
 }

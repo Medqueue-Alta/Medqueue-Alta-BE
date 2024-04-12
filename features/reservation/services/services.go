@@ -24,30 +24,24 @@ func NewReservationService(model reservation.ReservationModel) reservation.Reser
 }
 
 func (s *service) AddReservation(userid *jwt.Token, reservasiBaru reservation.Reservation) (reservation.Reservation, error) {
-	userInfo, err := middlewares.DecodeTokenWithClaims(userid)
-    if err != nil {
-        log.Println("error decode token", err.Error())
-        return reservation.Reservation{}, err
-    }
-
-	user, err := s.m.GetUserByID(userInfo)
-    if err != nil {
-        log.Println("error mendapatkan informasi pengguna", err.Error())
-        return reservation.Reservation{}, err
+	id,role,nama := middlewares.DecodeToken(userid)
+	if id == 0 {
+		log.Println("error decode token:", "token tidak ditemukan")
+		return reservation.Reservation{}, errors.New("data tidak valid")
 	}
 
-	if user.Role != "pasien" {
+	if role != "pasien" {
         log.Println("error: hanya pasien yang diizinkan menambah reservasi")
         return reservation.Reservation{}, errors.New("hanya admin yang diizinkan menambah reservasi")
     }
 
-	err = s.v.Struct(&reservasiBaru)
+	err := s.v.Struct(&reservasiBaru)
 	if err != nil {
 		log.Println("error validasi", err.Error())
 		return reservation.Reservation{}, err
 	}
 
-	result, err := s.m.AddReservation(user.ID, reservasiBaru)
+	result, err := s.m.AddReservation(id, reservasiBaru, nama)
 	if err != nil {
 		return reservation.Reservation{}, errors.New(helper.ServerGeneralError)
 	}
@@ -56,28 +50,37 @@ func (s *service) AddReservation(userid *jwt.Token, reservasiBaru reservation.Re
 }
 
 func (s *service) UpdateReservation(userid *jwt.Token, reservationID uint, data reservation.Reservation) (reservation.Reservation, error) {
-	id := middlewares.DecodeToken(userid)
-	if id == 0 {
-		log.Println("error decode token:", "token tidak ditemukan")
-		return reservation.Reservation{}, errors.New("data tidak valid")
-	}
+    // Mendekode token untuk mendapatkan ID pengguna dan peran
+    id, role, _ := middlewares.DecodeToken(userid)
+    if id == 0 {
+        log.Println("error decode token:", "token tidak ditemukan")
+        return reservation.Reservation{}, errors.New("data tidak valid")
+    }
 
-	err := s.v.Struct(data)
-	if err != nil {
-		log.Println("error validasi aktivitas", err.Error())
-		return reservation.Reservation{}, err
-	}
+    // Jika pengguna bukan pemilik reservasi atau admin, kembalikan kesalahan
+    if role != "admin" && id != data.UserID {
+        return reservation.Reservation{}, errors.New("anda tidak memiliki izin untuk melakukan pembaruan")
+    }
 
-	result, err := s.m.UpdateReservation(id, reservationID, data)
-	if err != nil {
-		return reservation.Reservation{}, errors.New("tidak dapat update")
-	}
+    // Melakukan validasi struktur data reservasi
+    err := s.v.Struct(data)
+    if err != nil {
+        log.Println("error validasi aktivitas", err.Error())
+        return reservation.Reservation{}, err
+    }
 
-	return result, nil
+    // Melakukan pembaruan reservasi di model
+    result, err := s.m.UpdateReservation(id, reservationID, data)
+    if err != nil {
+        return reservation.Reservation{}, errors.New("tidak dapat update")
+    }
+
+    return result, nil
 }
 
+
 func (s *service) DeleteReservation(userid *jwt.Token, reservationID uint) error {
-    id := middlewares.DecodeToken(userid)
+    id,_,_ := middlewares.DecodeToken(userid)
     if id == 0 {
         log.Println("error decode token:", "token tidak ditemukan")
         return errors.New("data tidak valid")

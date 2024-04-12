@@ -75,7 +75,7 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 		return user.User{}, "", errors.New(helper.UserCredentialError)
 	}
 
-	token, err := middlewares.GenerateJWT(dbData.ID)
+	token, err := middlewares.GenerateJWT(dbData.ID, dbData.Nama, dbData.Role)
 	if err != nil {
 		return user.User{}, "", errors.New(helper.ServiceGeneralError)
 	}
@@ -84,8 +84,8 @@ func (s *service) Login(loginData user.User) (user.User, string, error) {
 }
 
 func (s *service) Profile(token *jwt.Token) (user.User, error) {
-	decodeId := middlewares.DecodeToken(token)
-	result, err := s.model.GetUserByID(decodeId)
+	userID,_,_ := middlewares.DecodeToken(token)
+	result, err := s.model.GetUserByID(userID)
 	if err != nil {
 		return user.User{}, err
 	}
@@ -94,9 +94,9 @@ func (s *service) Profile(token *jwt.Token) (user.User, error) {
 }
 
 func (s *service) Update(token *jwt.Token, newData user.User) (user.User, error) {
-    decodedID := middlewares.DecodeToken(token)
+    userID, _, _ := middlewares.DecodeToken(token)
 
-    existingUser, err := s.model.GetUserByID(decodedID)
+    existingUser, err := s.model.GetUserByID(userID)
     if err != nil {
         return user.User{}, errors.New("user not found")
     }
@@ -145,7 +145,7 @@ func (s *service) Update(token *jwt.Token, newData user.User) (user.User, error)
         existingUser.NoTelepon = newData.NoTelepon
     }
 
-    result, err := s.model.Update(decodedID, existingUser)
+    result, err := s.model.Update(userID, existingUser)
     if err != nil {
         return user.User{}, err
     }
@@ -155,13 +155,13 @@ func (s *service) Update(token *jwt.Token, newData user.User) (user.User, error)
 
 
 func (s *service) Delete(token *jwt.Token) error {
-    decodedID := middlewares.DecodeToken(token)
-    if decodedID == 0 {
+    userID,_,_ := middlewares.DecodeToken(token)
+    if userID == 0 {
         log.Println("error decode token:", "token tidak ditemukan")
         return errors.New("data tidak valid")
     }
 
-    err := s.model.Delete(decodedID)
+    err := s.model.Delete(userID)
     if err != nil {
         return errors.New("data berhasil dihapus")
     }

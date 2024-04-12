@@ -20,7 +20,6 @@ type ScheduleModel interface {
 	DeleteSchedule(userid uint, scheduleID uint) error
 	GetAllSchedules() ([]Schedule, error)
 	GetScheduleByID(scheduleID uint) (*Schedule, error)
-	GetUserByID(userID uint) (User, error)
 	GetSchedulesByPoliID(poliID uint) ([]Schedule, error)
 }
 
@@ -40,11 +39,4 @@ type Schedule struct {
 	WaktuMulai 			string `json:"jam_mulai"`
 	WaktuSelesai		string `json:"jam_selesai"`
 	Kuota	 			uint   `json:"kuota"`
-}
-
-type User struct {
-	ID 				uint		`json:"id"`
-	Role			string		`json:"role"`
-	Nama 			string		`json:"nama"`
-	Email 			string		`json:"email"`
 }

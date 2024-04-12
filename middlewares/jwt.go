@@ -10,9 +10,11 @@ import (
 )
 
 // GenerateJWT digunakan untuk membuat token JWT dengan ID.
-func GenerateJWT(id uint) (string, error) {
+func GenerateJWT(id uint, role string, nama string) (string, error) {
     var data = jwt.MapClaims{}
     data["id"] = id
+    data["role"] = role
+    data["nama"] =  nama
     data["iat"] = time.Now().Unix()
     data["exp"] = time.Now().Add(time.Hour * 3).Unix()
 
@@ -33,28 +35,25 @@ func GenerateJWT(id uint) (string, error) {
 }
 
 
-func DecodeToken(token *jwt.Token) uint {
-    var result uint
+func DecodeToken(token *jwt.Token) (uint, string, string) {
+    var userID uint
+    var userRole string
+    var userNama string
     var claim = token.Claims.(jwt.MapClaims)
 
     if val, found := claim["id"]; found {
-        result = uint(val.(float64)) 
+        userID = uint(val.(float64)) 
     }
 
-    return result
-}
-
-func DecodeTokenWithClaims(token *jwt.Token) (uint, error) {
-    var result uint
-    var claim = token.Claims.(jwt.MapClaims)
-
-    if val, found := claim["id"]; found {
-        result = uint(val.(float64))
-    } else {
-        return 0, errors.New("ID pengguna tidak ditemukan dalam token")
+    if val, found := claim["role"];found {
+        userRole = val.(string)
     }
 
-    return result, nil
+    if val, found := claim["nama"];found {
+        userNama = val.(string)
+    }
+
+    return userID, userRole, userNama
 }
 
 
