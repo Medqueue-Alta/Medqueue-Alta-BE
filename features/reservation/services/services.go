@@ -50,7 +50,7 @@ func (s *service) AddReservation(userid *jwt.Token, reservasiBaru reservation.Re
     }
 
 
-    reservasiTime, err := time.Parse("02-01-2006", reservasiBaru.TanggalDaftar)
+    reservasiTime, err := time.Parse("2006-01-02T15:04:05.000Z", reservasiBaru.TanggalDaftar)
     if err != nil {
         log.Println("error:", err.Error())
         return reservation.Reservation{}, err
@@ -66,7 +66,6 @@ func (s *service) AddReservation(userid *jwt.Token, reservasiBaru reservation.Re
     if err != nil {
         return reservation.Reservation{}, errors.New(helper.ServerGeneralError)
     }
-
 
     return result, nil
 }
