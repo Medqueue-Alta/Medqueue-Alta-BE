@@ -42,6 +42,8 @@ func (ct *controller) Add() echo.HandlerFunc {
 			return c.JSON(code,
 				helper.ResponseFormat(code, err.Error(), nil))
 		}
+
+
 		return c.JSON(http.StatusCreated,
 			helper.ResponseFormat(http.StatusCreated, "selamat data sudah terdaftar", nil))
 	}
@@ -74,8 +76,8 @@ func (ct *controller) Login() echo.HandlerFunc {
 		}
 
 		var responseData LoginResponse
-		responseData.Nama = result.Nama
 		responseData.Role = result.Role
+		responseData.Nama = result.Nama
 		responseData.Email = result.Email
 		responseData.Token = token
 
@@ -100,8 +102,20 @@ func (ct *controller) Profile() echo.HandlerFunc {
 				helper.ResponseFormat(code, err.Error(), nil))
 		}
 
+		var responseData ProfileResponse
+		responseData.ID = result.ID
+		responseData.Role = result.Role
+		responseData.Nama = result.Nama
+		responseData.Email = result.Email
+		responseData.TempatLahir = result.TempatLahir
+		responseData.TanggalLahir = result.TanggalLahir
+		responseData.GolonganDarah = result.GolonganDarah
+		responseData.NIK = result.NIK
+		responseData.NoBPJS = result.NoBPJS
+		responseData.NoTelepon = result.NoTelepon
+
 		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "berhasil mendapatkan data", result))
+			helper.ResponseFormat(http.StatusOK, "berhasil mendapatkan data", responseData))
 	}
 }
 
@@ -127,15 +141,27 @@ func (ct *controller) Update() echo.HandlerFunc {
 				helper.ResponseFormat(http.StatusBadRequest, "terdapat kesalahan pada data input", nil))
 		}
 
-		updatedUser, err := ct.service.Update(token, inputData)
+		result, err := ct.service.Update(token, inputData)
 		if err != nil {
 			log.Println("failed to update user:", err.Error())
 			return c.JSON(http.StatusInternalServerError,
 				helper.ResponseFormat(http.StatusInternalServerError, helper.UserInputError, nil))
 		}
 
+		var responseData ProfileResponse
+		responseData.ID = result.ID
+		responseData.Role = result.Role
+		responseData.Nama = result.Nama
+		responseData.Email = result.Email
+		responseData.TempatLahir = result.TempatLahir
+		responseData.TanggalLahir = result.TanggalLahir
+		responseData.GolonganDarah = result.GolonganDarah
+		responseData.NIK = result.NIK
+		responseData.NoBPJS = result.NoBPJS
+		responseData.NoTelepon = result.NoTelepon
+
 		return c.JSON(http.StatusOK,
-			helper.ResponseFormat(http.StatusOK, "berhasil mengubah data", updatedUser))
+			helper.ResponseFormat(http.StatusOK, "berhasil mengubah data", responseData))
 	}
 }
 

@@ -43,7 +43,7 @@ func (ct *controller) Add() echo.HandlerFunc {
 				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
-        _, _, nama := middlewares.DecodeToken(token)
+        id, _, nama := middlewares.DecodeToken(token)
 
 		var inputProcess reservation.Reservation
 		inputProcess.PoliID = input.PoliID
@@ -51,15 +51,27 @@ func (ct *controller) Add() echo.HandlerFunc {
 		inputProcess.ScheduleID = input.ScheduleID
 		inputProcess.Keluhan = input.Keluhan
         inputProcess.Bpjs = input.Bpjs
-        inputProcess.Status = "waiting"
         inputProcess.Nama = nama
+        inputProcess.Status = "waiting"
 		result, err := ct.s.AddReservation(token, inputProcess)
 		if err != nil {
 			log.Println("error insert db:", err.Error())
 			return c.JSON(http.StatusInternalServerError, helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
 		}
 
-		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "berhasil menambahkan reservasi", result))
+
+        var responseData ReservationResponse
+        responseData.ID = result.ID
+        responseData.UserID = id
+        responseData.Nama = nama
+        responseData.ScheduleID = result.ScheduleID
+        responseData.PoliID = result.PoliID
+        responseData.TanggalDaftar = result.TanggalDaftar
+        responseData.Keluhan = result.Keluhan
+        responseData.Bpjs = result.Bpjs
+        responseData.Status = result.Status
+
+		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "berhasil menambahkan reservasi", responseData))
 	}
 }
 
@@ -96,6 +108,7 @@ func (ct *controller) Update() echo.HandlerFunc {
 			ScheduleID: input.ScheduleID,
 			Keluhan: input.Keluhan,
             Bpjs: input.Bpjs,
+            Status: input.Status,
         })
         if err != nil {
             log.Println("gagal update:", err.Error())

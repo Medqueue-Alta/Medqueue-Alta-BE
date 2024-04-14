@@ -6,4 +6,5 @@ type ReservationRequest struct {
 	ScheduleID    uint   `json:"id_jadwal" form:"id_jadwal"`
 	Keluhan       string `json:"keluhan" form:"keluhan"`
 	Bpjs          bool   `json:"bpjs" form:"bpjs"`
+	Status        string `json:"status" form:"status"`
 }

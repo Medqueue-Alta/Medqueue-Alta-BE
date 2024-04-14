@@ -28,8 +28,8 @@ func (rm *model) AddReservation(userid uint, reservasiBaru reservation.Reservati
 		ScheduleID: inputProcess.ScheduleID, Keluhan: inputProcess.Keluhan, Bpjs: inputProcess.Bpjs, Status: inputProcess.Status, Nama: inputProcess.Nama,}, nil
 }
 
-func (rm *model) UpdateReservation(userid uint, reservationID uint, data reservation.Reservation) (reservation.Reservation, error) {
-	var qry = rm.connection.Where("user_id = ? AND id = ?", userid, reservationID).Updates(data)
+func (rm *model) UpdateReservation(reservationID uint, data reservation.Reservation) (reservation.Reservation, error) {
+	var qry = rm.connection.Where(" id = ?", reservationID).Updates(data)
 	if err := qry.Error; err != nil {
 		return reservation.Reservation{}, err
 	}
@@ -79,3 +79,13 @@ func (rm *model) GetReservationsByPoliID(poliID uint) ([]reservation.Reservation
     }
     return result, nil
 }
+
+func (rm *model) GetScheduleByID(scheduleID uint) (*reservation.Schedule, error) {
+	var result reservation.Schedule
+	if err := rm.connection.Where("id = ?", scheduleID).First(&result).Error; err != nil {
+		return nil, err
+	}
+
+	return &result, nil 
+}
+
