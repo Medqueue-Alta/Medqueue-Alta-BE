@@ -11,7 +11,7 @@ type ReservationController interface {
 	Delete() echo.HandlerFunc
 	ShowAllReservations() echo.HandlerFunc
 	ShowReservationByID() echo.HandlerFunc
-	ShowReservationsByPoliID() echo.HandlerFunc
+	ShowMyReservation() echo.HandlerFunc
 }
 
 type ReservationModel interface {
@@ -22,6 +22,7 @@ type ReservationModel interface {
 	GetReservationByID(reservationID uint) (*Reservation, error)
 	GetReservationsByPoliID(poliID uint) ([]Reservation, error)
 	GetScheduleByID(scheduleID uint) (*Schedule, error)
+	GetReservationByOwner(userid uint) ([]Reservation, error)
 }
 
 type ReservationService interface {
@@ -31,6 +32,7 @@ type ReservationService interface {
 	GetAllReservations() ([]Reservation, error)
 	GetReservationByID(reservationsID uint) (*Reservation, error)
 	GetReservationsByPoliID(poliID uint) ([]Reservation, error)
+	GetReservationByOwner(userid *jwt.Token) ([]Reservation, error)
 }
 
 type Reservation struct {
@@ -43,6 +45,8 @@ type Reservation struct {
 	Keluhan 			string `json:"keluhan"`
 	Bpjs 				bool   `json:"bpjs"`
 	Status				string `gorm:"default:waiting" json:"status"`
+	NoAntrian			int64   `json:"antrian_anda"`
+	AntrianNow          int64   `json:"antrian_sekarang" gorm:"default:1"`
 }
 
 type Schedule struct {
@@ -52,9 +56,4 @@ type Schedule struct {
 	WaktuMulai 			string `json:"jam_mulai"`
 	WaktuSelesai		string `json:"jam_selesai"`
 	Kuota	 			uint   `json:"kuota"`
-}
-
-type ReservationCount struct {
-    ScheduleID uint
-    Count      uint
 }

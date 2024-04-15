@@ -12,4 +12,5 @@ type Reservation struct {
 	Keluhan 			string
 	Bpjs				bool
 	Status				string `gorm:"default:waiting"`
+	NoAntrian			int64
 }

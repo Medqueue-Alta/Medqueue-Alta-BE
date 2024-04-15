@@ -10,4 +10,6 @@ type ReservationResponse struct {
 	Keluhan       string `json:"keluhan"`
 	Bpjs          bool   `json:"bpjs"`
 	Status        string `gorm:"default:waiting" json:"status"`
+	NoAntrian     int64  `json:"antrian_anda"`
+	AntrianNow    int64  `json:"antrian_sekarang" gorm:"default:1"`
 }

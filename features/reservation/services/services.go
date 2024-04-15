@@ -156,3 +156,19 @@ func (s *service) GetReservationsByPoliID(poliID uint) ([]reservation.Reservatio
     }
     return schedules, nil
 }
+
+func (s *service) GetReservationByOwner(userid *jwt.Token) ([]reservation.Reservation, error) {
+	id,_,_ := middlewares.DecodeToken(userid)
+	if id == 0 {
+		log.Println("error decode token:", "token tidak ditemukan")
+		return nil, errors.New("data tidak valid")
+	}
+
+	// Memanggil method GetActivityByOwner dari model untuk mendapatkan aktivitas berdasarkan pemilik
+	reservation, err := s.m.GetReservationByOwner(id)
+	if err != nil {
+		return nil, errors.New(helper.ServerGeneralError)
+	}
+
+	return reservation, nil
+}

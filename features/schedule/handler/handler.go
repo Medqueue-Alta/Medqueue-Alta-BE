@@ -48,6 +48,7 @@ func (ct *controller) Add() echo.HandlerFunc {
 		inputProcess.WaktuMulai = input.WaktuMulai
 		inputProcess.WaktuSelesai = input.WaktuSelesai
         inputProcess.Kuota = input.Kuota
+        inputProcess.Terisi = 0
 		result, err := ct.s.AddSchedule(token, inputProcess)
 		if err != nil {
 			log.Println("error insert db:", err.Error())
@@ -131,21 +132,6 @@ func (ct *controller) Delete() echo.HandlerFunc {
     }
 }
 
-
-func (ct *controller) ShowAllSchedules() echo.HandlerFunc {
-    return func(c echo.Context) error {
-        schedule, err := ct.s.GetAllSchedules()
-        if err != nil {
-            log.Println("gagal mendapat schedule user:", err.Error())
-            return c.JSON(http.StatusInternalServerError,
-                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
-        }
-
-        return c.JSON(http.StatusOK,
-            helper.ResponseFormat(http.StatusOK, "schedule pengguna", schedule))
-    }
-}
-
 func (ct *controller) ShowScheduleByID() echo.HandlerFunc {
     return func(c echo.Context) error {
         scheduleID, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -173,7 +159,7 @@ func (ct *controller) ShowScheduleByID() echo.HandlerFunc {
 }
 
 
-func (ct *controller) ShowSchedulesByPoliID() echo.HandlerFunc {
+func (ct *controller) ShowAllSchedules() echo.HandlerFunc {
     return func(c echo.Context) error {
         // Dapatkan nilai parameter query "poli_id"
         poliIDStr := c.QueryParam("poli_id")

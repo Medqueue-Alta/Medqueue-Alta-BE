@@ -9,9 +9,8 @@ type ScheduleController interface {
 	Add() echo.HandlerFunc
 	Update() echo.HandlerFunc
 	Delete() echo.HandlerFunc
-	ShowAllSchedules() echo.HandlerFunc
 	ShowScheduleByID() echo.HandlerFunc
-	ShowSchedulesByPoliID() echo.HandlerFunc
+	ShowAllSchedules() echo.HandlerFunc
 }
 
 type ScheduleModel interface {
@@ -39,4 +38,13 @@ type Schedule struct {
 	WaktuMulai 			string `json:"jam_mulai"`
 	WaktuSelesai		string `json:"jam_selesai"`
 	Kuota	 			uint   `json:"kuota"`
+	Terisi 	 			int64  `json:"terisi"`
+}
+
+type Reservation struct {
+	ID 					uint   `gorm:"auto_increment" json:"reservations_id"`
+	UserID				uint   `json:"user_id"`
+	Nama				string `json:"nama"`
+	ScheduleID			uint   `json:"id_jadwal"`
+	NoAntrian			int64   `json:"no_antrian"`
 }

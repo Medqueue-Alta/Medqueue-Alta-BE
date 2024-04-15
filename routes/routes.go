@@ -34,7 +34,7 @@ func reservationRoute(c *echo.Echo, rc reservation.ReservationController) {
 	c.POST("/reservations", rc.Add(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
-	c.GET("/reservations", rc.ShowReservationsByPoliID())
+	c.GET("/reservations", rc.ShowAllReservations())
 
 	c.GET("/reservations/:id", rc.ShowReservationByID())
 
@@ -44,6 +44,10 @@ func reservationRoute(c *echo.Echo, rc reservation.ReservationController) {
 	c.DELETE("/reservations/:id", rc.Delete(), echojwt.WithConfig(echojwt.Config{
 		SigningKey: []byte(config.JWTSECRET),
 	}))
+
+	c.GET("/reservation", rc.ShowMyReservation(), echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(config.JWTSECRET),
+	}))
 }
 
 func scheduleRoute(c *echo.Echo, sc schedule.ScheduleController) {
@@ -51,7 +55,7 @@ func scheduleRoute(c *echo.Echo, sc schedule.ScheduleController) {
 		SigningKey: []byte(config.JWTSECRET),
 	}))
 
-	c.GET("/schedules", sc.ShowSchedulesByPoliID())
+	c.GET("/schedules", sc.ShowAllSchedules())
 
 	c.GET("/schedules/:id", sc.ShowScheduleByID())
 

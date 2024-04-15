@@ -43,7 +43,7 @@ func (ct *controller) Add() echo.HandlerFunc {
 				helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
 		}
 
-        id, _, nama := middlewares.DecodeToken(token)
+        id, nama, _ := middlewares.DecodeToken(token)
 
 		var inputProcess reservation.Reservation
 		inputProcess.PoliID = input.PoliID
@@ -70,6 +70,7 @@ func (ct *controller) Add() echo.HandlerFunc {
         responseData.Keluhan = result.Keluhan
         responseData.Bpjs = result.Bpjs
         responseData.Status = result.Status
+        responseData.NoAntrian = result.NoAntrian
 
 		return c.JSON(http.StatusCreated, helper.ResponseFormat(http.StatusCreated, "berhasil menambahkan reservasi", responseData))
 	}
@@ -149,21 +150,6 @@ func (ct *controller) Delete() echo.HandlerFunc {
     }
 }
 
-
-func (ct *controller) ShowAllReservations() echo.HandlerFunc {
-    return func(c echo.Context) error {
-        reservation, err := ct.s.GetAllReservations()
-        if err != nil {
-            log.Println("gagal mendapat reservasi user:", err.Error())
-            return c.JSON(http.StatusInternalServerError,
-                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
-        }
-
-        return c.JSON(http.StatusOK,
-            helper.ResponseFormat(http.StatusOK, "reservasi pengguna", reservation))
-    }
-}
-
 func (ct *controller) ShowReservationByID() echo.HandlerFunc {
     return func(c echo.Context) error {
         reservationID, err := strconv.ParseUint(c.Param("id"), 10, 64)
@@ -191,7 +177,7 @@ func (ct *controller) ShowReservationByID() echo.HandlerFunc {
 }
 
 
-func (ct *controller) ShowReservationsByPoliID() echo.HandlerFunc {
+func (ct *controller) ShowAllReservations() echo.HandlerFunc {
     return func(c echo.Context) error {
         // Dapatkan nilai parameter query "poli_id"
         poliIDStr := c.QueryParam("poli_id")
@@ -226,5 +212,28 @@ func (ct *controller) ShowReservationsByPoliID() echo.HandlerFunc {
         // Kembalikan jadwal yang sesuai dalam respons
         return c.JSON(http.StatusOK,
             helper.ResponseFormat(http.StatusOK, "Jadwal untuk poliID "+strconv.FormatUint(poliID, 10), schedules))
+    }
+}
+
+func (ct *controller) ShowMyReservation() echo.HandlerFunc {
+    return func(c echo.Context) error {
+        // Mendapatkan token pengguna dari context
+        token, ok := c.Get("user").(*jwt.Token)
+        if !ok {
+            return c.JSON(http.StatusBadRequest,
+                helper.ResponseFormat(http.StatusBadRequest, helper.UserInputError, nil))
+        }
+
+        // Memanggil service untuk mendapatkan aktivitas pengguna
+        reservation, err := ct.s.GetReservationByOwner(token)
+        if err != nil {
+            log.Println("error get user reservation:", err.Error())
+            return c.JSON(http.StatusInternalServerError,
+                helper.ResponseFormat(http.StatusInternalServerError, helper.ServerGeneralError, nil))
+        }
+
+        // Mengembalikan respons HTTP dengan aktivitas pengguna
+        return c.JSON(http.StatusOK,
+            helper.ResponseFormat(http.StatusOK, "reservasi pengguna", reservation))
     }
 }
