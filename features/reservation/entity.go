@@ -44,7 +44,7 @@ type Reservation struct {
 	TanggalDaftar 		string `form:"tanggal_kunjungan" json:"tanggal_kunjungan"`
 	Keluhan 			string `json:"keluhan"`
 	Bpjs 				bool   `json:"bpjs"`
-	Status				string `gorm:"default:waiting" json:"status"`
+	Status				string `gorm:"default:Waiting" json:"status"`
 	NoAntrian			int64   `json:"antrian_anda"`
 	AntrianNow          int64   `json:"antrian_sekarang" gorm:"default:1"`
 }

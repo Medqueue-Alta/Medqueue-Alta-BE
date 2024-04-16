@@ -11,6 +11,6 @@ type Reservation struct {
 	TanggalDaftar 		string
 	Keluhan 			string
 	Bpjs				bool
-	Status				string `gorm:"default:waiting"`
+	Status				string `gorm:"default:Waiting"`
 	NoAntrian			int64
 }
