@@ -54,25 +54,23 @@ func (rm *model) GetAllReservations() ([]reservation.Reservation, error) {
         return nil, err
     }
 
-    // Membuat peta untuk menyimpan runningQueue berdasarkan ScheduleID
-    runningQueues := make(map[uint]int64)
+    // Membuat peta untuk menyimpan jumlah reservasi terlepas dari status berdasarkan ScheduleID
+    counts := make(map[uint]int64)
 
-    // Menghitung jumlah reservasi dengan status "waiting" berdasarkan ScheduleID
+    // Menghitung jumlah reservasi berdasarkan ScheduleID dari database
     for i := range result {
-        if result[i].Status == "Check In" || result[i].Status == "Skipped" {
-            runningQueue, found := runningQueues[result[i].ScheduleID]
-            if !found {
-                // Jika belum ada runningQueue untuk ScheduleID ini, hitung dari database
-                var count int64
-                if err := rm.connection.Model(&result[i]).Where("status = ? AND schedule_id = ?", "waiting", result[i].ScheduleID).Count(&count).Error; err != nil {
-                    return nil, err
-                }
-                runningQueue = count
-                runningQueues[result[i].ScheduleID] = runningQueue
-            }
-            // Perbarui nilai AntrianNow dengan runningQueue sesuai ScheduleID
-            result[i].AntrianNow = runningQueue
+        // Hitung jumlah reservasi yang sudah "Skipped" atau "Check In" untuk ScheduleID tertentu
+        var count int64
+        if err := rm.connection.Model(&reservation.Reservation{}).Where("status IN (?) AND schedule_id = ?", []string{"Skipped", "Check In"}, result[i].ScheduleID).Count(&count).Error; err != nil {
+            return nil, err
         }
+        counts[result[i].ScheduleID] = count
+    }
+
+    // Mengatur AntrianNow berdasarkan jumlah reservasi yang sudah Check In atau Skipped
+    for i := range result {
+        // Set AntrianNow ke total count
+        result[i].AntrianNow = counts[result[i].ScheduleID]
     }
 
     return result, nil
@@ -110,26 +108,25 @@ func (rm *model) GetReservationsByPoliID(poliID uint) ([]reservation.Reservation
         return nil, err
     }
 
-    // Membuat peta untuk menyimpan runningQueue berdasarkan ScheduleID
-    runningQueues := make(map[uint]int64)
+    // Membuat peta untuk menyimpan jumlah reservasi terlepas dari status berdasarkan ScheduleID
+    counts := make(map[uint]int64)
 
-    // Menghitung jumlah reservasi dengan status "waiting" berdasarkan ScheduleID
+    // Menghitung jumlah reservasi berdasarkan ScheduleID dari database
     for i := range result {
-        if result[i].Status == "Check In" || result[i].Status == "Skipped" {
-            runningQueue, found := runningQueues[result[i].ScheduleID]
-            if !found {
-                // Jika belum ada runningQueue untuk ScheduleID ini, hitung dari database
-                var count int64
-                if err := rm.connection.Model(&result[i]).Where("status = ? AND schedule_id = ?", "waiting", result[i].ScheduleID).Count(&count).Error; err != nil {
-                    return nil, err
-                }
-                runningQueue = count
-                runningQueues[result[i].ScheduleID] = runningQueue
-            }
-            // Perbarui nilai AntrianNow dengan runningQueue sesuai ScheduleID
-            result[i].AntrianNow = runningQueue
+        // Hitung jumlah reservasi yang sudah "Skipped" atau "Check In" untuk ScheduleID tertentu
+        var count int64
+        if err := rm.connection.Model(&reservation.Reservation{}).Where("status IN (?) AND schedule_id = ?", []string{"Skipped", "Check In"}, result[i].ScheduleID).Count(&count).Error; err != nil {
+            return nil, err
         }
+        counts[result[i].ScheduleID] = count
     }
+
+    // Mengatur AntrianNow berdasarkan jumlah reservasi yang sudah Check In atau Skipped
+    for i := range result {
+        // Set AntrianNow ke total count
+        result[i].AntrianNow = counts[result[i].ScheduleID]
+    }
+
     return result, nil
 }
 
@@ -148,27 +145,40 @@ func (rm *model) GetReservationByOwner(userid uint) ([]reservation.Reservation, 
         return nil, err
     }
 
-    // Membuat peta untuk menyimpan runningQueue berdasarkan ScheduleID
-    runningQueues := make(map[uint]int64)
+    // Membuat peta untuk menyimpan jumlah reservasi terlepas dari status berdasarkan ScheduleID
+    counts := make(map[uint]int64)
 
-    // Menghitung jumlah reservasi dengan status "waiting" berdasarkan ScheduleID
+    // Menghitung jumlah reservasi berdasarkan ScheduleID dari database
     for i := range result {
-        if result[i].Status == "Check In" || result[i].Status == "Skipped" {
-            runningQueue, found := runningQueues[result[i].ScheduleID]
-            if !found {
-                // Jika belum ada runningQueue untuk ScheduleID ini, hitung dari database
-                var count int64
-                if err := rm.connection.Model(&result[i]).Where("status = ? AND schedule_id = ?", "waiting", result[i].ScheduleID).Count(&count).Error; err != nil {
-                    return nil, err
-                }
-                runningQueue = count
-                runningQueues[result[i].ScheduleID] = runningQueue
-            }
-            // Perbarui nilai AntrianNow dengan runningQueue sesuai ScheduleID
-            result[i].AntrianNow = runningQueue
+        // Hitung jumlah reservasi yang sudah "Skipped" atau "Check In" untuk ScheduleID tertentu
+        var count int64
+        if err := rm.connection.Model(&reservation.Reservation{}).Where("status IN (?) AND schedule_id = ?", []string{"Skipped", "Check In"}, result[i].ScheduleID).Count(&count).Error; err != nil {
+            return nil, err
         }
+        counts[result[i].ScheduleID] = count
+    }
+
+    // Mengatur AntrianNow berdasarkan jumlah reservasi yang sudah Check In atau Skipped
+    for i := range result {
+        // Set AntrianNow ke total count
+        result[i].AntrianNow = counts[result[i].ScheduleID]
     }
 
     return result, nil
 }
+
+func (rm *model) GetLastReservationByScheduleID(scheduleID uint) (reservation.Reservation, error) {
+    var lastReservation reservation.Reservation
+    if err := rm.connection.Where("schedule_id = ?", scheduleID).Order("no_antrian desc").First(&lastReservation).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            // Return default reservation with NoAntrian = 0
+            return reservation.Reservation{NoAntrian: 0}, nil
+        }
+        // Handle other errors
+        return reservation.Reservation{}, err
+    }
+    return lastReservation, nil
+}
+
+
 

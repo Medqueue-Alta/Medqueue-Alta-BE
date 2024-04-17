@@ -53,6 +53,7 @@ func (ct *controller) Add() echo.HandlerFunc {
         inputProcess.Bpjs = input.Bpjs
         inputProcess.Nama = nama
         inputProcess.Status = "Waiting"
+        
 		result, err := ct.s.AddReservation(token, inputProcess)
 		if err != nil {
 			log.Println("error insert db:", err.Error())

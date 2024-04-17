@@ -59,7 +59,32 @@ func (s *service) AddReservation(userid *jwt.Token, reservasiBaru reservation.Re
     if schedule.Hari != reservasiTime.Weekday().String() {
         return reservation.Reservation{}, errors.New("tanggal reservasi tidak sesuai dengan jadwal")
     }
-    log.Println(reservasiBaru.TanggalDaftar)
+
+    // Dapatkan nomor antrian terakhir untuk jadwal yang dipilih
+    lastReservation, err := s.m.GetLastReservationByScheduleID(uint(reservasiBaru.ScheduleID))
+    if err != nil {
+        // Handle case where no reservation is found for the given scheduleID
+        // For example, you can set default values or return an error indicating that no reservation is found
+        log.Println("error:", err.Error())
+        return reservation.Reservation{}, errors.New(helper.ServerGeneralError)
+    }
+
+    // Jika reservasi terakhir tidak ditemukan, gunakan nomor antrian awal (misalnya 1) sebagai nilai default
+    if lastReservation.ID == 0 {
+        reservasiBaru.NoAntrian = 1
+    } else {
+        // Periksa apakah nomor antrian sudah mencapai atau melebihi kuota
+        if lastReservation.NoAntrian >= int64(schedule.Kuota) {
+            return reservation.Reservation{}, errors.New("kuota untuk jadwal ini sudah terpenuhi")
+        }
+        // Nomor antrian baru adalah nomor antrian terakhir ditambah 1
+        reservasiBaru.NoAntrian = lastReservation.NoAntrian + 1
+    }
+
+    // Jika reservasi terakhir tidak ditemukan, gunakan nomor antrian awal (misalnya 1) sebagai nilai default
+    if lastReservation.ID != 0 && lastReservation.Status == "Waiting" {
+        return reservation.Reservation{}, errors.New("tidak bisa menambahkan reservasi baru, reservasi sebelumnya masih menunggu")
+    }
 
     // Lakukan operasi tambah reservasi jika poli_id sesuai
     result, err := s.m.AddReservation(id, reservasiBaru, nama)
@@ -105,7 +130,7 @@ func (s *service) UpdateReservation(userid *jwt.Token, reservationID uint, data 
     // Menggunakan ID pengguna (userID) dan ID reservasi (reservationID) dalam pembaruan
     result, err := s.m.UpdateReservation(reservationID, data)
     if err != nil {
-        return reservation.Reservation{}, errors.New("tidak dapat update 1")
+        return reservation.Reservation{}, errors.New("tidak dapat update")
     }
 
     return result, nil

@@ -1,6 +1,7 @@
 package data
 
 import (
+	"Medqueue-Alta-BE/features/reservation"
 	"Medqueue-Alta-BE/features/schedule"
 	"errors"
 
@@ -81,7 +82,18 @@ func (rm *model) GetScheduleByID(scheduleID uint) (*schedule.Schedule, error) {
 
 
 func (rm *model) DeleteSchedule(userid uint, scheduleID uint) error {
-    result := rm.connection.Unscoped().Where("user_id = ? AND id = ?", userid, scheduleID).Delete(&Schedule{})
+    // Hapus juga semua reservasi terkait dengan jadwal tersebut
+    result := rm.connection.Unscoped().Where("schedule_id = ?", scheduleID).Delete(&reservation.Reservation{})
+    if result.Error != nil {
+        return result.Error
+    }
+
+    if result.RowsAffected == 0 {
+        return errors.New("no data affected")
+    }
+
+    // Hapus jadwal berdasarkan id dan user_id
+    result = rm.connection.Unscoped().Where("user_id = ? AND id = ?", userid, scheduleID).Delete(&Schedule{})
     if result.Error != nil {
         return result.Error
     }
@@ -92,6 +104,7 @@ func (rm *model) DeleteSchedule(userid uint, scheduleID uint) error {
 
     return nil
 }
+
 
 
 func (rm *model) GetSchedulesByPoliID(poliID uint) ([]schedule.Schedule, error) {

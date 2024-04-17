@@ -23,6 +23,7 @@ type ReservationModel interface {
 	GetReservationsByPoliID(poliID uint) ([]Reservation, error)
 	GetScheduleByID(scheduleID uint) (*Schedule, error)
 	GetReservationByOwner(userid uint) ([]Reservation, error)
+	GetLastReservationByScheduleID(scheduleID uint) (Reservation, error)
 }
 
 type ReservationService interface {
