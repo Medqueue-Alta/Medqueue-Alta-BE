@@ -88,10 +88,6 @@ func (rm *model) DeleteSchedule(userid uint, scheduleID uint) error {
         return result.Error
     }
 
-    if result.RowsAffected == 0 {
-        return errors.New("no data affected")
-    }
-
     // Hapus jadwal berdasarkan id dan user_id
     result = rm.connection.Unscoped().Where("user_id = ? AND id = ?", userid, scheduleID).Delete(&Schedule{})
     if result.Error != nil {
